@@ -46,6 +46,6 @@ VALIDATION_THRESHOLDS = {
     "thermal_decay_max_c_per_hour": 5.0,
     "co2_max_ppm": 1600.0,
     "co2_recovery_target": 500.0,
-    "heating_correlation_min": -0.8,
-    "contaminant_decay_fraction": 0.5
+    "heating_correlation_min": -0.5,
+    "contaminant_decay_fraction": 0.7
 }

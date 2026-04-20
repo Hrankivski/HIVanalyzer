@@ -1,0 +1,35 @@
+Program Version,EnergyPlus, Version 25.2.0-cf7368216c, YMD=2026.04.20 11:20,
+   ** Warning ** CheckUsedConstructions: There are 2 nominally unused constructions in input.
+   **   ~~~   ** For explicit details on each unused construction, use Output:Diagnostics,DisplayExtraWarnings;
+   ** Severe  ** InitPurchasedAir: In ZoneHVAC:IdealLoadsAirSystem = LAB_AC_SYSTEM
+   **   ~~~   ** Zone Exhaust Air Node Name=ZONE_RETURN_NODE is not a zone exhaust node.
+   **   ~~~   ** Check ZoneHVAC:EquipmentConnections for zone=MAINZONE
+   **   ~~~   ** Zone return air node will be used for ideal loads recirculation air.
+   ************* Testing Individual Branch Integrity
+   ************* All Branches passed integrity testing
+   ************* Testing Individual Supply Air Path Integrity
+   ************* All Supply Air Paths passed integrity testing
+   ************* Testing Individual Return Air Path Integrity
+   ************* All Return Air Paths passed integrity testing
+   ************* No node connection errors were found.
+   ************* Beginning Simulation
+   ** Warning ** In zone MAINZONE there is unbalanced air flow. Load due to induced outdoor air is neglected.
+   **   ~~~   **  Environment=ANNUAL, at Simulation time=01/02 01:00 - 01:15
+   **   ~~~   **   Flows [m3/s]: Inlets: 3.416062E-002  Unbalanced exhausts: 4.167000E-002  Returns: 0.000000
+   **   ~~~   **   Infiltration: 3.754565E-003  Zone Ventilation: 0.000000  Mixing (incoming): 0.000000
+   **   ~~~   **   Imbalance (excess outflow): 3.754815E-003  Total system OA flow (for all airloops serving this zone): 0.000000
+   **   ~~~   **   This error will only be reported once per zone.
+   ************* Simulation Error Summary *************
+   ************* There are 1 unused schedules in input.
+   ************* Use Output:Diagnostics,DisplayUnusedSchedules; to see them.
+   *************
+   ************* ===== Final Error Summary =====
+   ************* The following error categories occurred.  Consider correcting or noting.
+   ************* Nominally Unused Constructions
+   ************* ..The nominally unused constructions warning is provided to alert you to potential conditions that can cause
+   ************* ..extra time during simulation. Each construction is calculated by the algorithm indicated in the HeatBalanceAlgorithm
+   ************* ..object. You may remove the constructions indicated (when you use the DisplayExtraWarnings option).
+   *************
+   ************* EnergyPlus Warmup Error Summary. During Warmup: 0 Warning; 0 Severe Errors.
+   ************* EnergyPlus Sizing Error Summary. During Sizing: 0 Warning; 0 Severe Errors.
+   ************* EnergyPlus Completed Successfully-- 2 Warning; 1 Severe Errors; Elapsed Time=00hr 00min  2.77sec

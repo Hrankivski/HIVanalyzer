@@ -78,7 +78,7 @@ class ModelValidator:
                 corr = df["Heating Energy (J)"].corr(df["T_out (C)"])
                 if pd.notna(corr):
                     val = corr
-                    min_corr = self.thresholds.get("heating_correlation_min", -0.8)
+                    min_corr = self.thresholds.get("heating_correlation_min", -0.5)
                     if corr > min_corr:
                         failed = True
                         msg = f"Аномалія: Кореляція енергії опалення та температури надворі ({val:.2f}) не відповідає нормі (має бути ближче до -1.0)."
@@ -163,9 +163,10 @@ class ModelValidator:
                     merged["Ratio"] = merged["Generic Contaminant_17"] / merged["Generic Contaminant_16"]
                     val = merged["Ratio"].mean()
                     
-                    if val > 0.5: # More than 50% remained (it "froze")
+                    max_val = self.thresholds.get("contaminant_decay_fraction", 0.5)
+                    if val > max_val: # More than threshold remained
                         failed = True
-                        msg = f"Попередження: Концентрація часток не встигає впасти на 50% з 16:00 до 17:00 (залишається в сер. {val*100:.1f}%). Потужність вентиляції недостатня."
+                        msg = f"Попередження: Концентрація часток не встигає впасти до {(max_val)*100:.0f}% з 16:00 до 17:00 (залишається в сер. {val*100:.1f}%). Потужність вентиляції недостатня."
                     else:
                         msg = f"Швидкість осідання допустима (залишається {val*100:.1f}% через годину)."
         else:

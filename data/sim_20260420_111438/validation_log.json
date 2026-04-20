@@ -1,0 +1,50 @@
+[
+  {
+    "name": "Thermal Decay (Теплова інерція)",
+    "status": "Pass",
+    "value": 1.2201031999717316,
+    "message": "Теплова інерція стін у нормі (плавне остигання)."
+  },
+  {
+    "name": "CO₂ Dynamics (Пік та Відновлення)",
+    "status": "Pass",
+    "value": 902.373167734988,
+    "message": "Динаміка CO₂ в нормі."
+  },
+  {
+    "name": "Heating Correlation (Адекватність Опалення)",
+    "status": "Pass",
+    "value": -0.6156990831391429,
+    "message": "Опалення працює синхронно з погодними умовами."
+  },
+  {
+    "name": "Heat Recovery Check (ККД)",
+    "status": "Pass",
+    "value": 85.33556527933008,
+    "message": "Середній ККД рекуперації: 85.3%."
+  },
+  {
+    "name": "Anomalies Detection (Неможливі величини)",
+    "status": "Pass",
+    "value": 0.0,
+    "message": "Критичних фізичних аномалій не виявлено."
+  },
+  {
+    "name": "Contaminant Decay (Очищення повітря)",
+    "status": "Pass",
+    "value": 0.6784106957572934,
+    "message": "Швидкість осідання допустима (залишається 67.8% через годину)."
+  },
+  {
+    "name": "Weekend Logic (Внутрішні виділення)",
+    "status": "Pass",
+    "value": 481.6866340248075,
+    "message": "Ресурс не витрачається марно на вихідних."
+  },
+  {
+    "name": "DCV Check (Енергобаланс вентиляторів)",
+    "status": "Pass",
+    "value": 0.36930027487140776,
+    "message": "Система DCV (Demand Controlled Ventilation) працює коректно."
+  }
+]
