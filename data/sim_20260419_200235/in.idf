@@ -1,0 +1,488 @@
+Version, 25.2;
+SimulationControl, No, No, No, No, Yes;
+Timestep, 4;
+ScheduleTypeLimits, Temperature, -60, 200, Continuous, Temperature;
+
+Schedule:Constant, OutdoorCO2Schedule, Any Number, 400.0;
+Schedule:Constant, OutdoorGenericContaminantSchedule, Any Number, 0.0;
+ZoneAirContaminantBalance,
+    Yes,                     !- Carbon Dioxide Concentration
+    OutdoorCO2Schedule,      !- Outdoor Carbon Dioxide Schedule Name
+    Yes,                     !- Generic Contaminant Concentration
+    OutdoorGenericContaminantSchedule; !- Outdoor Generic Contaminant Schedule Name
+
+Building,
+    Recuperator Room,        !- Name
+    0.0,                     !- North Axis {deg}
+    City,                    !- Terrain
+    0.04,                    !- Loads Convergence Tolerance Value
+    0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
+    FullExterior,            !- Solar Distribution
+    25,                      !- Maximum Number of Warmup Days
+    6;                       !- Minimum Number of Warmup Days
+
+GlobalGeometryRules, LowerLeftCorner, CounterClockWise, Relative;
+Site:Location, Kyiv_UA, 50.45, 30.52, 2.0, 179.0;
+RunPeriod, Annual, 1, 1, 2026, 12, 31, 2026, Thursday, Yes, Yes, No, Yes, Yes;
+ScheduleTypeLimits, Any Number, , , Continuous;
+Schedule:Constant, AlwaysOn, Any Number, 1.0;
+Material,
+    Concrete_Mat,          !- Name
+    MediumRough,             !- Roughness
+    0.380,         !- Thickness {m}
+    1.740, !- Conductivity
+    2400.0,      !- Density
+    840.0, !- Specific Heat
+    0.9, 0.7, 0.7;
+
+Material,
+    Insulation_Layer,        !- Name
+    Rough,                   !- Roughness
+    0.1,                     !- Thickness {m}
+    0.04,                    !- Conductivity
+    50,                      !- Density
+    1200,                    !- Specific Heat
+    0.9, 0.7, 0.7;
+
+Material,
+    Plaster_Layer,           !- Name
+    Smooth,                  !- Roughness
+    0.012,                   !- Thickness {m}
+    0.16,                    !- Conductivity
+    800,                     !- Density
+    1090,                    !- Specific Heat
+    0.9, 0.7, 0.7;
+
+WindowMaterial:SimpleGlazingSystem,
+    Glass_Mat,               !- Name
+    2.7,                     !- U-Factor {W/m2-K}
+    0.7,                     !- Solar Heat Gain Coefficient
+    0.8;                     !- Visible Transmittance
+
+Construction, External_Wall_Cons, Insulation_Layer, Concrete_Mat, Plaster_Layer;
+Construction, Glass_Wall_Cons, Glass_Mat;
+Construction, Floor_Cons, Concrete_Mat;
+Construction, DoublePane_Cons, Glass_Mat;
+
+Zone,
+    MainZone,                !- Name
+    0.0, 0.0, 0.0, 0.0, 1, 1,
+    3.25, 197.60;
+
+BuildingSurface:Detailed,
+    Bottom_Wall, Wall, External_Wall_Cons, MainZone, , Outdoors, ,
+    SunExposed,
+    WindExposed,
+    autocalculate, 4,
+    0.00, 0.00, 3.25,
+    0.00, 0.00, 0.00,
+    11.75, 0.00, 0.00,
+    11.75, 0.00, 3.25;
+
+BuildingSurface:Detailed,
+    Right_Wall, Wall, External_Wall_Cons, MainZone, , Outdoors, ,
+    SunExposed,
+    WindExposed,
+    autocalculate, 4,
+    11.75, 0.00, 3.25,
+    11.75, 0.00, 0.00,
+    11.75, 4.00, 0.00,
+    11.75, 4.00, 3.25;
+
+BuildingSurface:Detailed,
+    Inner_Top_Wall, Wall, External_Wall_Cons, MainZone, , Outdoors, ,
+    SunExposed,
+    WindExposed,
+    autocalculate, 4,
+    11.75, 4.00, 3.25,
+    11.75, 4.00, 0.00,
+    6.00, 4.00, 0.00,
+    6.00, 4.00, 3.25;
+
+BuildingSurface:Detailed,
+    Inner_Right_Wall, Wall, External_Wall_Cons, MainZone, , Adiabatic, ,
+    NoSun,
+    NoWind,
+    autocalculate, 4,
+    6.00, 4.00, 3.25,
+    6.00, 4.00, 0.00,
+    6.00, 6.30, 0.00,
+    6.00, 6.30, 3.25;
+
+BuildingSurface:Detailed,
+    Top_Wall, Wall, External_Wall_Cons, MainZone, , Outdoors, ,
+    SunExposed,
+    WindExposed,
+    autocalculate, 4,
+    6.00, 6.30, 3.25,
+    6.00, 6.30, 0.00,
+    0.00, 6.30, 0.00,
+    0.00, 6.30, 3.25;
+
+BuildingSurface:Detailed,
+    Left_Wall, Wall, External_Wall_Cons, MainZone, , Outdoors, ,
+    SunExposed,
+    WindExposed,
+    autocalculate, 4,
+    0.00, 6.30, 3.25,
+    0.00, 6.30, 0.00,
+    0.00, 0.00, 0.00,
+    0.00, 0.00, 3.25;
+
+BuildingSurface:Detailed, Floor_1, Floor, External_Wall_Cons, MainZone, , Outdoors, , NoSun, NoWind, autocalculate, 6,
+    0.00, 0.00, 0.00,
+    0.00, 6.30, 0.00,
+    6.00, 6.30, 0.00,
+    6.00, 4.00, 0.00,
+    11.75, 4.00, 0.00,
+    11.75, 0.00, 0.00;
+
+BuildingSurface:Detailed, Ceiling_1, Roof, External_Wall_Cons, MainZone, , Outdoors, , SunExposed, WindExposed, autocalculate, 6,
+    0.00, 0.00, 3.25,
+    11.75, 0.00, 3.25,
+    11.75, 4.00, 3.25,
+    6.00, 4.00, 3.25,
+    6.00, 6.30, 3.25,
+    0.00, 6.30, 3.25;
+
+FenestrationSurface:Detailed,
+    Lab_Window_1,            !- Name
+    Window,                  !- Surface Type
+    DoublePane_Cons,         !- Construction Name
+    Right_Wall,              !- Building Surface Name
+    ,                        !- Outside Boundary Condition Object
+    0.5,                     !- View Factor to Ground
+    ,                        !- Frame and Divider Name
+    1,                       !- Multiplier
+    4,                       !- Number of Vertices
+    11.75, 1.0, 2.0,
+    11.75, 1.0, 1.0,
+    11.75, 2.0, 1.0,
+    11.75, 2.0, 2.0;
+
+Schedule:Compact,
+    Lab_Occupancy_Sched,     !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays,           !- Field 2
+    Until: 09:00, 0.0,       !- Field 3
+    Until: 13:00, 1.0,       !- Field 4
+    Until: 14:00, 0.1,       !- Field 5
+    Until: 18:00, 1.0,       !- Field 6
+    Until: 24:00, 0.0,       !- Field 7
+    For: AllOtherDays,       !- Field 8
+    Until: 24:00, 0.0;       !- Field 9
+
+Schedule:Compact,
+    Equipment_Activity_Sched,!- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays,           !- Field 2
+    Until: 09:15, 0.0,       !- Field 3
+    Until: 13:00, 1.0,       !- Field 4
+    Until: 14:15, 0.0,       !- Field 5
+    Until: 18:00, 1.0,       !- Field 6
+    Until: 24:00, 0.0,       !- Field 7
+    For: AllOtherDays,       !- Field 8
+    Until: 24:00, 0.0;       !- Field 9
+
+Schedule:Compact,
+    Lab_Activity_Spikes,     !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Tuesday,            !- Field 2
+    Until: 10:00, 0.0,       !- Field 3
+    Until: 11:30, 1.0,       !- Field 4
+    Until: 24:00, 0.0,       !- Field 5
+    For: Thursday,           !- Field 6
+    Until: 14:00, 0.0,       !- Field 7
+    Until: 16:00, 1.0,       !- Field 8
+    Until: 24:00, 0.0,       !- Field 9
+    For: AllOtherDays,       !- Field 10
+    Until: 24:00, 0.0;       !- Field 11
+
+People,
+    Lab_Students,            !- Name
+    MainZone,                !- Zone Name
+    Lab_Occupancy_Sched,     !- Number of People Schedule Name
+    People,                  !- Number of People Calculation Method
+    5,             !- Number of People
+    ,                        !- People per Floor Area
+    ,                        !- Floor Area per Person
+    0.3,                     !- Fraction Radiant
+    autocalculate,           !- Sensible Heat Fraction
+    ActivityLevel,           !- Activity Level Schedule Name
+    3.82E-8;                 !- Carbon Dioxide Generation Rate {m3/s-W}
+
+Schedule:Constant, ActivityLevel, Any Number, 120.0;
+
+ElectricEquipment,
+    Workstations,            !- Name
+    MainZone,                !- Zone Name
+    Equipment_Activity_Sched,!- Schedule Name
+    EquipmentLevel,          !- Design Level Calculation Method
+    1200.0,                  !- Design Level {W} (4x300W)
+    ,                        !- Watts per Zone Floor Area
+    ,                        !- Watts per Person
+    0.0,                     !- Fraction Latent
+    0.3,                     !- Fraction Radiant
+    0.2;                     !- Fraction Lost
+
+ElectricEquipment,
+    3D_Printer_Heat,         !- Name
+    MainZone,                !- Zone Name
+    Equipment_Activity_Sched,!- Schedule Name
+    EquipmentLevel,          !- Design Level Calculation Method
+    500.0, !- Design Level {W}
+    ,                        !- Watts per Zone Floor Area
+    ,                        !- Watts per Person
+    0.0,                     !- Fraction Latent
+    0.2,                     !- Fraction Radiant
+    0.1;                     !- Fraction Lost
+
+Lights,
+    Lab_Lights,              !- Name
+    MainZone,                !- Zone Name
+    Lab_Occupancy_Sched,     !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Lighting Level
+    10.0,                    !- Watts per Zone Floor Area
+    ,                        !- Watts per Person
+    0.0,                     !- Return Air Fraction
+    0.4,                     !- Fraction Radiant
+    0.2,                     !- Fraction Visible
+    1.0,                     !- Fraction Replaceable
+    General;                 !- End-Use Subcategory
+
+ZoneContaminantSourceAndSink:Generic:Constant,
+    Soldering_Emissions,     !- Name
+    MainZone,                !- Zone Name
+    0.010000,    !- Design Generation Rate {m3/s}
+    Lab_Activity_Spikes,     !- Schedule Name
+    0.0,                     !- Efficiency of Removal
+    AlwaysOn                 !- Removal Schedule Name
+    ;                        !- Multiplier
+
+ZoneContaminantSourceAndSink:Generic:Constant,
+    Printer_Dust,            !- Name
+    MainZone,                !- Zone Name
+    0.002000, !- Design Generation Rate {m3/s}
+    Lab_Activity_Spikes,     !- Schedule Name
+    0.0,                     !- Efficiency of Removal
+    AlwaysOn                 !- Removal Schedule Name
+    ;                        !- Multiplier
+
+Schedule:Compact,
+    DCV_Fan_Modulation,      !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays,           !- Field 2
+    Until: 09:00, 0.0,       !- Field 3
+    Until: 13:00, 1.0,       !- Field 4
+    Until: 14:00, 0.4,       !- Field 5
+    Until: 18:00, 1.0,       !- Field 6
+    Until: 24:00, 0.0,       !- Field 7
+    For: AllOtherDays,       !- Field 8
+    Until: 24:00, 0.0;       !- Field 9
+
+DesignSpecification:OutdoorAir,
+    Lab_OutdoorAir_Spec,     !- Name
+    Sum,                     !- Outdoor Air Method
+    0.008,                   !- Outdoor Air Flow per Person {m3/s}
+    0.001;                   !- Outdoor Air Flow per Zone Floor Area {m3/s}
+
+Controller:MechanicalVentilation,
+    Lab_Vent_Controller,     !- Name
+    DCV_Fan_Modulation,      !- Availability Schedule Name
+    Yes,                     !- Demand Controlled Ventilation
+    IndoorAirQualityProcedure,!- Baseline Method
+    ,                        !- Event Method
+    MainZone,                !- Zone 1 Name
+    Lab_OutdoorAir_Spec;     !- Design Specification Outdoor Air Object Name 1
+
+ZoneHVAC:EnergyRecoveryVentilator,
+    Lab_Recuperator,         !- Name
+    DCV_Fan_Modulation,      !- Availability Schedule Name
+    Lab_HX,                  !- Heat Exchanger Name
+    0.04167,         !- Supply Air Flow Rate {m3/s}
+    0.04167,         !- Exhaust Air Flow Rate {m3/s}
+    Supply_Fan,              !- Supply Air Fan Name
+    Exhaust_Fan;             !- Exhaust Air Fan Name
+
+HeatExchanger:AirToAir:SensibleAndLatent,
+    Lab_HX,                  !- Name
+    AlwaysOn,                !- Availability Schedule Name
+    0.04167,         !- Nominal Supply Air Flow Rate {m3/s}
+    0.85,            !- Nominal Sensible Effectiveness at 100% Heating Air Flow
+    0.85,            !- Nominal Latent Effectiveness at 100% Heating Air Flow
+    0.85,            !- Nominal Sensible Effectiveness at 100% Cooling Air Flow
+    0.85,            !- Nominal Latent Effectiveness at 100% Cooling Air Flow
+    ERV_OA_Inlet,            !- Supply Air Inlet Node Name
+    ERV_HX_Supply_Out,       !- Supply Air Outlet Node Name
+    ERV_RA_Inlet,            !- Exhaust Air Inlet Node Name
+    ERV_HX_Exhaust_Out;      !- Exhaust Air Outlet Node Name
+
+Curve:Cubic,
+    FanPowerCurve,           !- Name
+    0.0408,                  !- Coefficient1 Constant
+    0.088,                   !- Coefficient2 x
+    -0.0729,                 !- Coefficient3 x**2
+    0.9437,                  !- Coefficient4 x**3
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+Fan:SystemModel,
+    Supply_Fan,              !- Name
+    DCV_Fan_Modulation,      !- Availability Schedule Name
+    ERV_HX_Supply_Out,       !- Air Inlet Node Name
+    ERV_SA_Outlet,           !- Air Outlet Node Name
+    0.04167,         !- Design Maximum Air Flow Rate {m3/s}
+    Continuous,              !- Speed Control Method
+    0.1,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    autocalculate,           !- Design Electrical Power Consumption
+    PowerPerFlowPerPressure, !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate
+    1.66667,                 !- Electric Power Per Unit Flow Rate Per Unit Pressure
+    0.7,                     !- Fan Total Efficiency
+    FanPowerCurve;           !- Electric Power Function of Flow Fraction Curve Name
+
+Fan:SystemModel,
+    Exhaust_Fan,             !- Name
+    DCV_Fan_Modulation,      !- Availability Schedule Name
+    ERV_HX_Exhaust_Out,      !- Air Inlet Node Name
+    ERV_EA_Outlet,           !- Air Outlet Node Name
+    0.04167,         !- Design Maximum Air Flow Rate {m3/s}
+    Continuous,              !- Speed Control Method
+    0.1,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    autocalculate,           !- Design Electrical Power Consumption
+    PowerPerFlowPerPressure, !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate
+    1.66667,                 !- Electric Power Per Unit Flow Rate Per Unit Pressure
+    0.7,                     !- Fan Total Efficiency
+    FanPowerCurve;           !- Electric Power Function of Flow Fraction Curve Name
+
+OutdoorAir:Node, ERV_OA_Inlet;
+
+ZoneInfiltration:DesignFlowRate,
+    Lab_Infiltration,        !- Name
+    MainZone,                !- Zone Name
+    AlwaysOn,                !- Schedule Name
+    Flow/Zone,               !- Design Flow Rate Calculation Method
+    0.015,                   !- Design Flow Rate {m3/s}
+    ,                        !- Flow per Zone Floor Area
+    ,                        !- Flow per Exterior Surface Area
+    ,                        !- Air Changes per Hour
+    0.2,                     !- Constant Term Coefficient
+    0.0,                     !- Temperature Term Coefficient
+    0.0,                     !- Velocity Term Coefficient
+    0.032;                   !- Velocity Squared Term Coefficient
+
+Schedule:Compact, HVACAvailability, Any Number, Through: 12/31, For: AllDays, Until: 24:00, 1.0;
+Schedule:Compact, ZoneControl_DualSetpoint, Any Number, Through: 12/31, For: AllDays, Until: 24:00, 4;
+
+Schedule:Compact,
+    Heating_Setpoint_Sched,  !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays,           !- Field 2
+    Until: 07:00, 15.0,      !- Field 3
+    Until: 19:00, 21.0,      !- Field 4
+    Until: 24:00, 15.0,      !- Field 5
+    For: AllOtherDays,       !- Field 6
+    Until: 24:00, 15.0;      !- Field 7
+
+ZoneControl:Thermostat,
+    MainZone_Thermostat,     !- Name
+    MainZone,                !- Zone Name
+    ZoneControl_DualSetpoint,!- Control Type Schedule Name
+    ThermostatSetpoint:DualSetpoint, !- Control 1 Object Type
+    Lab_Temperature_Setpoints; !- Control 1 Name
+
+Schedule:Compact,
+    Cooling_Setpoint_Sched,  !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays,           !- Field 2
+    Until: 07:00, 28.0,      !- Field 3
+    Until: 19:00, 24.0,      !- Field 4
+    Until: 24:00, 28.0,      !- Field 5
+    For: AllOtherDays,       !- Field 6
+    Until: 24:00, 28.0;      !- Field 7
+
+ThermostatSetpoint:DualSetpoint,
+    Lab_Temperature_Setpoints, !- Name
+    Heating_Setpoint_Sched,  !- Heating Setpoint Temperature Schedule Name
+    Cooling_Setpoint_Sched;  !- Cooling Setpoint Temperature Schedule Name
+
+ZoneHVAC:IdealLoadsAirSystem,
+    Lab_AC_System,           !- Name
+    HVACAvailability,        !- Availability Schedule Name
+    Ideal_Loads_Inlet,       !- Zone Supply Air Node Name
+    ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
+    50,                      !- Maximum Heating Supply Air Temperature {C}
+    13,                      !- Minimum Cooling Supply Air Temperature {C}
+    0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.009,                   !- Minimum Cooling Supply Air Humidity Ratio {kgWater/kgDryAir}
+    NoLimit,                 !- Heating Limit
+    autocalculate,           !- Maximum Heating Air Flow Rate {m3/s}
+    ,                        !- Maximum Sensible Heating Capacity {W}
+    NoLimit,                 !- Cooling Limit
+    autocalculate,           !- Maximum Cooling Air Flow Rate {m3/s}
+    ,                        !- Maximum Total Cooling Capacity {W}
+    HVACAvailability,        !- Heating Availability Schedule Name
+    HVACAvailability,        !- Cooling Availability Schedule Name
+    ConstantSupplyHumidityRatio, !- Dehumidification Control Type
+    0.7,                     !- Cooling Sensible Heat Ratio {dimensionless}
+    ConstantSupplyHumidityRatio; !- Humidification Control Type
+
+ZoneHVAC:EquipmentConnections,
+    MainZone,                !- Zone Name
+    Zone_Equipment,          !- Zone Conditioning Equipment List Name
+    Zone_Inlet_Nodes,        !- Zone Air Inlet Node or NodeList Name
+    Zone_Exhaust_Nodes,      !- Zone Air Exhaust Node or NodeList Name
+    Zone_Node,               !- Zone Air Node Name
+    Zone_Return_Node;        !- Zone Return Air Node Name
+
+ZoneHVAC:EquipmentList,
+    Zone_Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
+    ZoneHVAC:EnergyRecoveryVentilator, !- Equipment 1 Object Type
+    Lab_Recuperator,         !- Equipment 1 Name
+    1,                       !- Equipment 1 Cooling Sequence
+    1,                       !- Equipment 1 Heating or No-Load Sequence
+    ,                        !- Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Equipment 1 Sequential Heating Fraction Schedule Name
+    ZoneHVAC:IdealLoadsAirSystem, !- Equipment 2 Object Type
+    Lab_AC_System,           !- Equipment 2 Name
+    2,                       !- Equipment 2 Cooling Sequence
+    2,                       !- Equipment 2 Heating or No-Load Sequence
+    ,                        !- Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Equipment 2 Sequential Heating Fraction Schedule Name
+
+NodeList, Zone_Inlet_Nodes, ERV_SA_Outlet, Ideal_Loads_Inlet;
+NodeList, Zone_Exhaust_Nodes, ERV_RA_Inlet;
+
+
+Output:Variable, *, Site Outdoor Air Drybulb Temperature, Hourly;
+Output:Variable, *, Site Wind Speed, Hourly;
+Output:Variable, *, Zone Mean Air Temperature, Hourly;
+Output:Variable, *, Zone Air CO2 Concentration, Hourly;
+Output:Variable, *, Zone Generic Contaminant Concentration, Hourly;
+Output:Variable, *, Zone Air Infiltration Volume, Hourly;
+Output:Variable, *, Zone Air Infiltration Sensible Heat Loss Energy, Hourly;
+Output:Variable, *, Heat Exchanger Sensible Heating Energy, Hourly;
+Output:Variable, *, Fan Electricity Energy, Hourly;
+Output:Variable, *, Zone Air System Sensible Heating Energy, Hourly;
+Output:Variable, *, Zone Air System Sensible Cooling Energy, Hourly;
+Output:Variable, *, Zone Mechanical Ventilation Air Changes per Hour, Hourly;
+Output:Variable, *, Zone Generic Contaminant Concentration, Hourly;
+Output:Variable, ERV_SA_Outlet, System Node Temperature, Hourly;
+Output:Meter, Electricity:Facility, Hourly;
+OutputControl:Table:Style, Comma;

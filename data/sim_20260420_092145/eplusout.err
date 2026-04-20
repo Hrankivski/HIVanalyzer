@@ -1,0 +1,32 @@
+Program Version,EnergyPlus, Version 25.2.0-cf7368216c, YMD=2026.04.20 09:21,
+   ** Warning ** CheckUsedConstructions: There are 2 nominally unused constructions in input.
+   **   ~~~   ** For explicit details on each unused construction, use Output:Diagnostics,DisplayExtraWarnings;
+   ************* Testing Individual Branch Integrity
+   ************* All Branches passed integrity testing
+   ************* Testing Individual Supply Air Path Integrity
+   ************* All Supply Air Paths passed integrity testing
+   ************* Testing Individual Return Air Path Integrity
+   ************* All Return Air Paths passed integrity testing
+   ************* No node connection errors were found.
+   ************* Beginning Simulation
+   ************* Simulation Error Summary *************
+   ** Warning ** The following Report Variables were requested but not generated -- check.rdd file
+   **   ~~~   ** Either the IDF did not contain these elements, the variable name is misspelled,
+   **   ~~~   ** or the requested variable is an advanced output which requires Output : Diagnostics, DisplayAdvancedReportVariables;
+   ************* Key=*, VarName=ZONE GENERIC AIR CONTAMINANT CONCENTRATION, Frequency=Hourly
+   ** Warning ** The following lines are "Unused Objects".  These objects are in the input
+   **   ~~~   **  file but are never obtained by the simulation and therefore are NOT used.
+   **   ~~~   **  Only the first unused named object of an object class is shown.  Use Output:Diagnostics,DisplayAllWarnings; to see all.
+   **   ~~~   **  See InputOutputReference document for more details.
+   ************* Object=Controller:MechanicalVentilation=Lab_Vent_Controller
+   *************
+   ************* ===== Final Error Summary =====
+   ************* The following error categories occurred.  Consider correcting or noting.
+   ************* Nominally Unused Constructions
+   ************* ..The nominally unused constructions warning is provided to alert you to potential conditions that can cause
+   ************* ..extra time during simulation. Each construction is calculated by the algorithm indicated in the HeatBalanceAlgorithm
+   ************* ..object. You may remove the constructions indicated (when you use the DisplayExtraWarnings option).
+   *************
+   ************* EnergyPlus Warmup Error Summary. During Warmup: 0 Warning; 0 Severe Errors.
+   ************* EnergyPlus Sizing Error Summary. During Sizing: 0 Warning; 0 Severe Errors.
+   ************* EnergyPlus Completed Successfully-- 2 Warning; 0 Severe Errors; Elapsed Time=00hr 00min  4.29sec

@@ -1,0 +1,16 @@
+ ReadVarsESO
+ processing:data\sim_20260409_211435\in.rvi
+ input file:data\sim_20260409_211435\eplusout.eso
+ output file:data\sim_20260409_211435\eplusout.csv
+ getting all vars from:data\sim_20260409_211435\eplusout.eso
+  number variables requested for output=          12
+ ReadVars Run Time=00hr 00min  0.78sec
+ ReadVarsESO program completed successfully.
+ ReadVarsESO
+ processing:data\sim_20260409_211435\in.mvi
+ input file:data\sim_20260409_211435\eplusout.mtr
+ output file:data\sim_20260409_211435\eplusmtr.csv
+ getting all vars from:data\sim_20260409_211435\eplusout.mtr
+  number variables requested for output=           1
+ ReadVars Run Time=00hr 00min  0.20sec
+ ReadVarsESO program completed successfully.
