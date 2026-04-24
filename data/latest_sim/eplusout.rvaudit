@@ -1,0 +1,16 @@
+ ReadVarsESO
+ processing:data\latest_sim\in.rvi
+ input file:data\latest_sim\eplusout.eso
+ output file:data\latest_sim\eplusout.csv
+ getting all vars from:data\latest_sim\eplusout.eso
+  number variables requested for output=          13
+ ReadVars Run Time=00hr 00min  0.83sec
+ ReadVarsESO program completed successfully.
+ ReadVarsESO
+ processing:data\latest_sim\in.mvi
+ input file:data\latest_sim\eplusout.mtr
+ output file:data\latest_sim\eplusmtr.csv
+ getting all vars from:data\latest_sim\eplusout.mtr
+  number variables requested for output=           1
+ ReadVars Run Time=00hr 00min  0.17sec
+ ReadVarsESO program completed successfully.
