@@ -13,7 +13,7 @@ def render(room_l, room_w, room_l_cut, room_w_cut):
     )
     if not st.session_state.elements_df.empty:
         st.session_state.elements_df = st.data_editor(
-            st.session_state.elements_df, num_rows="dynamic", use_container_width=True
+            st.session_state.elements_df, num_rows="dynamic", width="stretch"
         )
     else:
         st.info("Додайте елементи за допомогою кнопок у боковій панелі ліворуч.")

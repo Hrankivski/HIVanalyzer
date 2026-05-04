@@ -1,0 +1,32 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Data and models
+data/latest_sim/
+data/*.csv
+models/
+!models/.gitkeep
+
+# Testing and coverage
+.coverage
+test_console.log
+test_report.html
+mock_out.csv
+mock_out.txt
+
+# Scratch and logs
+scratch_*.py
+ruff_log.txt
+dummy_db.json
+ppo_hvac_tensorboard/
+
+# Weather files
+weather/
+
+# Environment
+.env
+venv/
+env/
+.venv/

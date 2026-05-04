@@ -32,6 +32,7 @@ if __name__ == "__main__":
         n_steps=2048,
         batch_size=64,
         policy_kwargs=policy_kwargs,
+        device="cpu"
     )
 
     print("Training Agent... Monitor progress using: tensorboard --logdir ./logs/")

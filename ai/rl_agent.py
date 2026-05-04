@@ -107,7 +107,7 @@ def train_rl_agent(
     )
 
     # verbose=0 робить консоль повністю чистою, tensorboard_log=None виключає генерацію файлів
-    model = PPO("MlpPolicy", env, verbose=0, device="auto")
+    model = PPO("MlpPolicy", env, verbose=0, device="cpu")
 
     # Підключаємо наш Streamlit віджет замість консольного 'progress_bar=True'
     callback = StreamlitProgressCallback(timesteps, st_progress, st_text, st_chart)
@@ -167,7 +167,7 @@ def finetune_and_predict(room_config, timesteps=960, st_progress=None, st_text=N
         torch.set_num_threads(num_cores)
 
     try:
-        model = PPO.load(AGENT_MODEL_PATH, env=env, device="auto")
+        model = PPO.load(AGENT_MODEL_PATH, env=env, device="cpu")
     except ValueError as e:
         if "Observation spaces do not match" in str(e):
             return (

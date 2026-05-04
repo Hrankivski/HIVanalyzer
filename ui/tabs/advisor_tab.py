@@ -1,13 +1,5 @@
 import streamlit as st
-import pandas as pd
-import plotly.express as px
-import json
-import os
-from core import constants
-from ui import designer
-from simulation import idf_bridge, simulation_engine, validator
-from ai import rl_agent, ai_engine, ml_surrogate
-import plotly.graph_objects as go
+from ai import ai_engine
 
 
 def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
@@ -16,7 +8,6 @@ def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
         "Цей модуль порівнює класичне керування (рекуператор на 100%) з інтелектуальним керуванням (AI Auto-Pilot) на проміжку 24 годин."
     )
     
-    from ai import ai_engine
     
     ppo_model = ai_engine.load_ai_model()
     

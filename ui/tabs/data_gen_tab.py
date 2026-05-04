@@ -1,13 +1,10 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import json
 import os
 from core import constants
 from ui import designer
-from simulation import idf_bridge, simulation_engine, validator
-from ai import rl_agent, ai_engine, ml_surrogate
-import plotly.graph_objects as go
+from simulation import simulation_engine
 
 
 def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
@@ -43,7 +40,6 @@ def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
     
     st.markdown("---")
     st.subheader("Аналітика Зібраних Даних (Data Quality)")
-    import os
     
     if os.path.exists("data/training_dataset.csv"):
         df_ml = pd.read_csv("data/training_dataset.csv")
