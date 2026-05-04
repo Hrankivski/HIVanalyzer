@@ -75,6 +75,50 @@ def run_simulation(
         return False, f"Помилка виклику процесу: {str(e)}", sim_dir
 
 
+def _get_column_mapping(columns):
+    cols_to_keep = {}
+    for col in columns:
+        if "Date/Time" in col:
+            cols_to_keep[col] = "Datetime"
+        elif "Outdoor Air Drybulb Temperature" in col:
+            cols_to_keep[col] = "T_out (C)"
+        elif "Wind Speed" in col:
+            cols_to_keep[col] = "Wind Speed (m/s)"
+        elif "Zone Mean Air Temperature" in col:
+            cols_to_keep[col] = "T_in (C)"
+        elif "Zone Air CO2 Concentration" in col:
+            cols_to_keep[col] = "CO2 (ppm)"
+        elif "Generic Air Contaminant" in col:
+            cols_to_keep[col] = "Generic Contaminant"
+        elif (
+            "Zone Air Infiltration Volume" in col
+            or "Infiltration Standard Density Volume Flow Rate" in col
+        ):
+            cols_to_keep[col] = "Infiltration Volume (m3)"
+        elif "Infiltration Sensible Heat Loss" in col:
+            cols_to_keep[col] = "Infiltration Heat Loss (J)"
+        elif "Fan Electricity Energy" in col or (
+            "Electric" in col and "Fan" in col
+        ):
+            cols_to_keep[col] = "Fan Energy (J)"
+        elif "Electricity:Facility" in col:
+            cols_to_keep[col] = "Total Electricity (J)"
+        elif "Sensible Heating Energy" in col and (
+            "Ideal Loads" in col or "System" in col
+        ):
+            cols_to_keep[col] = "Heating Energy (J)"
+        elif "Sensible Cooling Energy" in col and (
+            "Ideal Loads" in col or "System" in col
+        ):
+            cols_to_keep[col] = "Cooling Energy (J)"
+        elif "System Node Temperature" in col and "ERV_SA_OUTLET" in col.upper():
+            cols_to_keep[col] = "T_supply (C)"
+        elif "Ventilation Air Changes per Hour" in col:
+            cols_to_keep[col] = "Ventilation ACH"
+        elif "Heat Exchanger Sensible Heating Energy" in col:
+            cols_to_keep[col] = "Heat Recovery (J)"
+    return cols_to_keep
+
 def get_results(csv_path: str) -> pd.DataFrame:
     """
     Parses the eplusout.csv file to extract specific columns.
@@ -82,47 +126,7 @@ def get_results(csv_path: str) -> pd.DataFrame:
     try:
         df = pd.read_csv(csv_path)
         # We look for partial matches to be robust against E+ version naming changes
-        cols_to_keep = {}
-        for col in df.columns:
-            if "Date/Time" in col:
-                cols_to_keep[col] = "Datetime"
-            elif "Outdoor Air Drybulb Temperature" in col:
-                cols_to_keep[col] = "T_out (C)"
-            elif "Wind Speed" in col:
-                cols_to_keep[col] = "Wind Speed (m/s)"
-            elif "Zone Mean Air Temperature" in col:
-                cols_to_keep[col] = "T_in (C)"
-            elif "Zone Air CO2 Concentration" in col:
-                cols_to_keep[col] = "CO2 (ppm)"
-            elif "Generic Air Contaminant" in col:
-                cols_to_keep[col] = "Generic Contaminant"
-            elif (
-                "Zone Air Infiltration Volume" in col
-                or "Infiltration Standard Density Volume Flow Rate" in col
-            ):
-                cols_to_keep[col] = "Infiltration Volume (m3)"
-            elif "Infiltration Sensible Heat Loss" in col:
-                cols_to_keep[col] = "Infiltration Heat Loss (J)"
-            elif "Fan Electricity Energy" in col or (
-                "Electric" in col and "Fan" in col
-            ):
-                cols_to_keep[col] = "Fan Energy (J)"
-            elif "Electricity:Facility" in col:
-                cols_to_keep[col] = "Total Electricity (J)"
-            elif "Sensible Heating Energy" in col and (
-                "Ideal Loads" in col or "System" in col
-            ):
-                cols_to_keep[col] = "Heating Energy (J)"
-            elif "Sensible Cooling Energy" in col and (
-                "Ideal Loads" in col or "System" in col
-            ):
-                cols_to_keep[col] = "Cooling Energy (J)"
-            elif "System Node Temperature" in col and "ERV_SA_OUTLET" in col.upper():
-                cols_to_keep[col] = "T_supply (C)"
-            elif "Ventilation Air Changes per Hour" in col:
-                cols_to_keep[col] = "Ventilation ACH"
-            elif "Heat Exchanger Sensible Heating Energy" in col:
-                cols_to_keep[col] = "Heat Recovery (J)"
+        cols_to_keep = _get_column_mapping(df.columns)
 
         if not cols_to_keep:
             return pd.DataFrame()

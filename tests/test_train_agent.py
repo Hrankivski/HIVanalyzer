@@ -21,7 +21,6 @@ def test_train_agent(monkeypatch):
     # Щоб не переписувати весь файл, просто викличемо ініціалізацію агента
     env = stable_baselines3.common.vec_env.SubprocVecEnv([train_agent.make_env()])
     
-    policy_kwargs = dict(net_arch=dict(pi=[64, 64], vf=[64, 64]))
     model = stable_baselines3.PPO("MlpPolicy", env)
     
     # Симулюємо виклики

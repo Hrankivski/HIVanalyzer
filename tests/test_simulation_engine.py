@@ -64,11 +64,43 @@ def test_run_simulation(monkeypatch):
 def test_get_results():
     import tempfile
     with tempfile.NamedTemporaryFile("w", delete=False, suffix=".csv") as f:
-        f.write("Date/Time,Environment:Site Outdoor Air Drybulb Temperature [C](TimeStep)\n01/01  24:00:00,-5.0\n")
+        header = (
+            "Date/Time,"
+            "Environment:Site Outdoor Air Drybulb Temperature [C](TimeStep),"
+            "Site Wind Speed [m/s],"
+            "Zone Mean Air Temperature [C],"
+            "Zone Air CO2 Concentration [ppm],"
+            "Zone Air Generic Air Contaminant Concentration [ppm],"
+            "Zone Air Infiltration Volume [m3],"
+            "Infiltration Sensible Heat Loss [J],"
+            "Fan Electricity Energy [J],"
+            "Electricity:Facility [J],"
+            "Zone Air System Sensible Heating Energy [J],"
+            "Zone Air System Sensible Cooling Energy [J],"
+            "ERV_SA_OUTLET System Node Temperature [C],"
+            "Zone Ventilation Air Changes per Hour [ach],"
+            "Heat Exchanger Sensible Heating Energy [J]\n"
+        )
+        f.write(header)
+        f.write("01/01  24:00:00,-5.0,2.0,20.0,400.0,0.0,10.0,100.0,50.0,500.0,200.0,0.0,15.0,0.5,100.0\n")
         name = f.name
     try:
         df = simulation_engine.get_results(name)
         assert not df.empty
+        assert "T_out (C)" in df.columns
+        assert "Wind Speed (m/s)" in df.columns
+        assert "T_in (C)" in df.columns
+        assert "CO2 (ppm)" in df.columns
+        assert "Generic Contaminant" in df.columns
+        assert "Infiltration Volume (m3)" in df.columns
+        assert "Infiltration Heat Loss (J)" in df.columns
+        assert "Fan Energy (J)" in df.columns
+        assert "Total Electricity (J)" in df.columns
+        assert "Heating Energy (J)" in df.columns
+        assert "Cooling Energy (J)" in df.columns
+        assert "T_supply (C)" in df.columns
+        assert "Ventilation ACH" in df.columns
+        assert "Heat Recovery (J)" in df.columns
     finally:
         import os
         os.remove(name)

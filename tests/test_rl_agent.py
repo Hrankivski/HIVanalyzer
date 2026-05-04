@@ -5,7 +5,7 @@ def test_load_rl_agent():
     """Тестує завантаження RL агента. Якщо файлу немає, має повернутись None."""
     # Перевіримо завантаження неіснуючої моделі (за умови що в models/ немає моделі)
     # Якщо модель є, він її завантажить. Тому просто перевіримо що виклик працює.
-    agent = rl_agent.load_rl_agent()
+    rl_agent.load_rl_agent()
     # assert agent is None # Не будемо робити assert None бо модель вже може існувати
     
 def test_predict_best_action():

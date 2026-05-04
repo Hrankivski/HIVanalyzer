@@ -1,11 +1,21 @@
 from unittest.mock import MagicMock
 
+class MockSessionState(dict):
+    def __getattr__(self, name): return self.get(name)
+    def __setattr__(self, name, value): self[name] = value
+
+class MockStatus(MagicMock):
+    def __enter__(self):
+        return self
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
 def test_tabs_render(monkeypatch):
     """Фіктивний тест для перевірки базового рендерингу UI вкладок без падінь."""
     import pandas as pd
     mock_st = MagicMock()
-    mock_df = pd.DataFrame({"Тип": ["Стіна"], "x_0": [0], "y_0": [0], "Ширина": [10], "Висота": [3], "Азимут": [0]})
-    mock_st.session_state = {"elements_df": mock_df, "project_settings": {"wall_thickness": 0.5, "city": "Kyiv"}}
+    mock_df = pd.DataFrame({"Тип": ["Стіна"], "X": [0], "Y": [0], "Ширина": [10], "Висота": [3], "Орієнтація": ["Горизонтально"]})
+    mock_st.session_state = MockSessionState({"elements_df": mock_df, "latest_df": mock_df, "latest_sim_dir": "test_dir", "project_settings": MockSessionState({"wall_thickness": 0.5, "city": "Kyiv", "occupants": 4, "target_temp_heat": 20, "target_temp_cool": 24, "hvac_power_limit": 3000, "recuperator_efficiency": 85})})
     mock_st.button.return_value = False
     mock_st.checkbox.return_value = False
     
@@ -25,30 +35,35 @@ def test_tabs_render(monkeypatch):
     monkeypatch.setattr("streamlit.session_state", mock_st.session_state)
     monkeypatch.setattr("streamlit.metric", mock_st.metric)
     monkeypatch.setattr("streamlit.empty", mock_st.empty)
-    monkeypatch.setattr("streamlit.spinner", mock_st.spinner)
+    monkeypatch.setattr("streamlit.spinner", MockStatus)
+    monkeypatch.setattr("streamlit.status", MockStatus)
+    monkeypatch.setattr("streamlit.expander", MockStatus)
     monkeypatch.setattr("streamlit.progress", mock_st.progress)
     monkeypatch.setattr("streamlit.success", mock_st.success)
     monkeypatch.setattr("streamlit.error", mock_st.error)
     monkeypatch.setattr("streamlit.warning", mock_st.warning)
     monkeypatch.setattr("streamlit.info", mock_st.info)
+    monkeypatch.setattr("streamlit.dataframe", mock_st.dataframe)
     monkeypatch.setattr("streamlit.tabs", lambda x: [mock_st] * len(x))
 
     try:
-        from ui.tabs import geometry_tab, save_tab, data_gen_tab, advisor_tab, ai_lab_tab
-        geometry_tab.render()
-        save_tab.render()
-        data_gen_tab.render()
-        advisor_tab.render()
-        ai_lab_tab.render()
+        from ui.tabs import geometry_tab, save_tab, data_gen_tab, advisor_tab, ai_lab_tab, climate_tab
+        geometry_tab.render(10.0, 5.0, 0.0, 0.0)
+        save_tab.render(10.0, 5.0, 3.0, 0.0, 0.0)
+        data_gen_tab.render(10.0, 5.0, 3.0, 0.0, 0.0)
+        advisor_tab.render(10.0, 5.0, 3.0, 0.0, 0.0)
+        ai_lab_tab.render(10.0, 5.0, 3.0, 0.0, 0.0)
+        climate_tab.render(10.0, 5.0, 3.0, 0.0, 0.0)
     except Exception:
-        pass
+        import traceback
+        traceback.print_exc()
 
 def test_tabs_render_clicks(monkeypatch):
     """Тестує ті ж вкладки, але з натиснутими кнопками."""
     import pandas as pd
     mock_st = MagicMock()
-    mock_df = pd.DataFrame({"Тип": ["Стіна"], "x_0": [0], "y_0": [0], "Ширина": [10], "Висота": [3], "Азимут": [0]})
-    mock_st.session_state = {"elements_df": mock_df, "project_settings": {"wall_thickness": 0.5, "city": "Kyiv"}}
+    mock_df = pd.DataFrame({"Тип": ["Стіна"], "X": [0], "Y": [0], "Ширина": [10], "Висота": [3], "Орієнтація": ["Горизонтально"]})
+    mock_st.session_state = MockSessionState({"elements_df": mock_df, "latest_df": mock_df, "latest_sim_dir": "test_dir", "project_settings": MockSessionState({"wall_thickness": 0.5, "city": "Kyiv", "occupants": 4, "target_temp_heat": 20, "target_temp_cool": 24, "hvac_power_limit": 3000, "recuperator_efficiency": 85})})
     mock_st.button.return_value = True
     mock_st.checkbox.return_value = True
     
@@ -67,20 +82,25 @@ def test_tabs_render_clicks(monkeypatch):
     monkeypatch.setattr("streamlit.session_state", mock_st.session_state)
     monkeypatch.setattr("streamlit.metric", mock_st.metric)
     monkeypatch.setattr("streamlit.empty", mock_st.empty)
-    monkeypatch.setattr("streamlit.spinner", mock_st.spinner)
+    monkeypatch.setattr("streamlit.spinner", MockStatus)
+    monkeypatch.setattr("streamlit.status", MockStatus)
+    monkeypatch.setattr("streamlit.expander", MockStatus)
     monkeypatch.setattr("streamlit.progress", mock_st.progress)
     monkeypatch.setattr("streamlit.success", mock_st.success)
     monkeypatch.setattr("streamlit.error", mock_st.error)
     monkeypatch.setattr("streamlit.warning", mock_st.warning)
     monkeypatch.setattr("streamlit.info", mock_st.info)
+    monkeypatch.setattr("streamlit.dataframe", mock_st.dataframe)
     monkeypatch.setattr("streamlit.tabs", lambda x: [mock_st] * len(x))
 
     try:
-        from ui.tabs import geometry_tab, save_tab, data_gen_tab, advisor_tab, ai_lab_tab
-        geometry_tab.render()
-        save_tab.render()
-        data_gen_tab.render()
-        advisor_tab.render()
-        ai_lab_tab.render()
+        from ui.tabs import geometry_tab, save_tab, data_gen_tab, advisor_tab, ai_lab_tab, climate_tab
+        geometry_tab.render(10.0, 5.0, 0.0, 0.0)
+        save_tab.render(10.0, 5.0, 3.0, 0.0, 0.0)
+        data_gen_tab.render(10.0, 5.0, 3.0, 0.0, 0.0)
+        advisor_tab.render(10.0, 5.0, 3.0, 0.0, 0.0)
+        ai_lab_tab.render(10.0, 5.0, 3.0, 0.0, 0.0)
+        climate_tab.render(10.0, 5.0, 3.0, 0.0, 0.0)
     except Exception:
-        pass
+        import traceback
+        traceback.print_exc()

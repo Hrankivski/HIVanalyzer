@@ -87,29 +87,7 @@ def transliterate(text: str) -> str:
     return text
 
 
-def generate_idf_structure(project_json: str) -> str:
-    """
-    Парсить JSON проекту та повертає повну структуру IDF для EnergyPlus v25.2.0.
-    Генерує файл із правильною кількістю полів (враховуючи Space Name).
-    """
-    data = json.loads(project_json)
-    geom = data.get("geometry", {})
-    settings = data.get("settings", {})
-    elements = data.get("elements", [])
-
-    # Параметри приміщення
-    l = float(geom.get("L", 11.75))  # noqa: E741
-    w = float(geom.get("W", 6.30))
-    h = float(geom.get("H", 3.25))
-    l_cut = float(geom.get("L_cut", 5.75))
-    w_cut = float(geom.get("W_cut", 2.30))
-
-    # Розрахунок об'єму для Г-подібної форми
-    vol = (l * w - l_cut * w_cut) * h
-
-    lines = []
-    lines.append("Version, 25.2;")
-
+def _generate_global_objects(lines, outdoor_co2):
     # ---------------- Global Objects ----------------
     lines.append("SimulationControl, No, No, No, No, Yes;")
     lines.append("Timestep, 4;")
@@ -117,7 +95,7 @@ def generate_idf_structure(project_json: str) -> str:
         "ScheduleTypeLimits, Temperature, -60, 200, Continuous, Temperature;\n"
     )
 
-    outdoor_co2 = constants.AIR_PHYSICS.get("outdoor_co2_ppm", 400.0)
+    # outdoor_co2 = constants.AIR_PHYSICS.get("outdoor_co2_ppm", 400.0)
     lines.append(f"Schedule:Constant, OutdoorCO2Schedule, Any Number, {outdoor_co2};")
     lines.append(
         "Schedule:Constant, OutdoorGenericContaminantSchedule, Any Number, 0.0;"
@@ -153,6 +131,8 @@ def generate_idf_structure(project_json: str) -> str:
     lines.append("ScheduleTypeLimits, Any Number, , , Continuous;")
     lines.append("Schedule:Constant, AlwaysOn, Any Number, 1.0;")
 
+
+def _generate_materials_and_constructions(settings, lines):
     # ---------------- Material Definitions (No Cyrillic) ----------------
     mat_name_ua = settings.get("wall_material", "Concrete")
     # Мапінг на англійські назви для запобігання помилок кодування
@@ -205,6 +185,8 @@ def generate_idf_structure(project_json: str) -> str:
     lines.append("Construction, Floor_Cons, Concrete_Mat;")  # Використовуємо латиницю
     lines.append("Construction, DoublePane_Cons, Glass_Mat;\n")
 
+
+def _generate_geometry(l, w, h, l_cut, w_cut, vol, is_l_shape, lines):
     # ---------------- Zone Definition ----------------
     lines.append("Zone,")
     lines.append("    MainZone,                !- Name")
@@ -277,6 +259,8 @@ def generate_idf_structure(project_json: str) -> str:
         lines.append(f"    {vx:.2f}, {vy:.2f}, {vz:.2f}{term}")
     lines.append("")
 
+
+def _generate_windows(elements, l, w, h, l_cut, w_cut, is_l_shape, lines):
     # ---------------- Windows (Solar Gains) ----------------
     window_idx = 1
     for el in elements:
@@ -351,6 +335,8 @@ def generate_idf_structure(project_json: str) -> str:
                 lines.append(f"    {v4[0]:.2f}, {v4[1]:.2f}, {v4[2]:.2f};\n")
                 window_idx += 1
 
+
+def _generate_schedules_and_internal_gains(settings, elements, occupants, lines):
     # ---------------- Internal Gains & Scheduling ----------------
     occupants = int(settings.get("occupants", 4))
     schedule_type = settings.get("schedule_type", "Офіс (09:00-18:00)")
@@ -530,6 +516,8 @@ def generate_idf_structure(project_json: str) -> str:
     lines.append("    0.0,                     !- Design Removal Coefficient")
     lines.append("    AlwaysOn;                !- Removal Schedule Name\n")
 
+
+def _generate_hvac_and_ventilation(settings, occupants, lines):
     # ---------------- HVAC & Ventilation ----------------
     # ---------------- Demand Controlled Ventilation (EMS) ----------------
     lines.append("Schedule:Constant, ERV_DCV_Fraction, Any Number, 1.0;\n")
@@ -848,6 +836,8 @@ def generate_idf_structure(project_json: str) -> str:
 
     lines.append("NodeList, Zone_Inlet_Nodes, ERV_SA_Outlet, Ideal_Loads_Inlet;")
     lines.append("NodeList, Zone_Exhaust_Nodes, ERV_RA_Inlet;\n")
+
+def _generate_outputs(lines):
     # ---------------- Outputs ----------------
     lines.append("\nOutput:VariableDictionary, Regular;")
     lines.append(
@@ -871,9 +861,47 @@ def generate_idf_structure(project_json: str) -> str:
     lines.append("Output:Meter, Electricity:Facility, Hourly;")
     lines.append("OutputControl:Table:Style, Comma;")
 
+
+
+
+
+def generate_idf_structure(project_json: str) -> str:
+
+    """
+    Парсить JSON проекту та повертає повну структуру IDF для EnergyPlus v25.2.0.
+    Генерує файл із правильною кількістю полів (враховуючи Space Name).
+    """
+    data = json.loads(project_json)
+    geom = data.get("geometry", {})
+    settings = data.get("settings", {})
+    elements = data.get("elements", [])
+
+    # Параметри приміщення
+    l = float(geom.get("L", 11.75))  # noqa: E741
+    w = float(geom.get("W", 6.30))
+    h = float(geom.get("H", 3.25))
+    l_cut = float(geom.get("L_cut", 5.75))
+    w_cut = float(geom.get("W_cut", 2.30))
+
+    # Розрахунок об'єму для Г-подібної форми
+    vol = (l * w - l_cut * w_cut) * h
+    is_l_shape = l_cut > 0.01 and w_cut > 0.01
+
+    lines = []
+    lines.append("Version, 25.2;")
+
+    outdoor_co2 = constants.AIR_PHYSICS.get("outdoor_co2_ppm", 400.0)
+    _generate_global_objects(lines, outdoor_co2)
+    _generate_materials_and_constructions(settings, lines)
+    _generate_geometry(l, w, h, l_cut, w_cut, vol, is_l_shape, lines)
+    _generate_windows(elements, l, w, h, l_cut, w_cut, is_l_shape, lines)
+    occupants = int(settings.get("occupants", 4))
+    _generate_schedules_and_internal_gains(settings, elements, occupants, lines)
+    _generate_hvac_and_ventilation(settings, occupants, lines)
+    _generate_outputs(lines)
+
     return "\n".join(lines)
-
-
+    
 def save_simulation_idf(project_json: str, directory: str = "simulations"):
     """
     Генерує IDF та зберігає його у файл з унікальним іменем simulation(timestamp).idf
