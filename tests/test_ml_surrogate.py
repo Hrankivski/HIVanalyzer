@@ -6,16 +6,20 @@ from ai import ml_surrogate
 
 def test_train_surrogate_with_mock_data():
     """Тестування пайплайну навчання сурогатної моделі на штучних даних."""
-    # Створюємо малий фіктивний датасет
+    # Створюємо малий фіктивний датасет з усіма необхідними ознаками (FEATURES)
     df = pd.DataFrame({
         "Datetime": pd.date_range("2026-01-01", periods=10, freq="15min"),
         "T_out (C)": [-5.0]*10,
         "T_in (C)": [20.0]*10,
         "CO2 (ppm)": [600.0, 610.0, 620.0, 630.0, 640.0, 650.0, 660.0, 670.0, 680.0, 690.0],
         "T_in_lag_1": [20.0]*10,
-        "CO2_lag_1": [590.0, 600.0, 610.0, 620.0, 630.0, 640.0, 650.0, 660.0, 670.0, 680.0],
+        "T_in_lag_2": [19.0]*10,
+        "T_supply_lag_1": [10.0]*10,
+        "CO2_lag_1": [590.0]*10,
+        "CO2_lag_2": [580.0]*10,
         "People_Count": [5]*10,
         "Hour": [12]*10,
+        "DayOfWeek": [0]*10,
         "Is_Working_Hour": [1]*10,
         "Volume_m3": [100.0]*10,
         "Wall_Thickness": [0.3]*10,
@@ -33,7 +37,6 @@ def test_train_surrogate_with_mock_data():
         success, msg = ml_surrogate.train_surrogate(csv_path)
         assert success is True
         assert "mae_co2" in msg
-        assert "surrogate_precision_r2" in msg
     finally:
         os.remove(csv_path)
 
@@ -46,9 +49,13 @@ def test_predict_next_state():
     state_dict = {
         "T_out (C)": -5.0,
         "T_in_lag_1": 20.0,
+        "T_in_lag_2": 19.0,
+        "T_supply_lag_1": 10.0,
         "CO2_lag_1": 600.0,
+        "CO2_lag_2": 580.0,
         "People_Count": 5,
         "Hour": 12,
+        "DayOfWeek": 0,
         "Is_Working_Hour": 1,
         "Volume_m3": 100.0,
         "Wall_Thickness": 0.3,

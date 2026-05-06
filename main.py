@@ -90,7 +90,7 @@ with st.sidebar.expander("Характеристики конструкцій"):
         ),
     )
 
-    # Display material properties
+    # Відображення характеристик обраного матеріалу
     sel_mat_props = constants.MATERIALS[
         st.session_state.project_settings["wall_material"]
     ]
@@ -199,43 +199,38 @@ if col_add3.button("Джерело тепла"):
 
 # --- ОСНОВНИЙ РОБОЧИЙ ПРОСТІР ---
 if dev_mode:
-    tabs = st.tabs(
-        [
-            "1. Геометрія кімнати",
-            "2. Ескізний ШІ-аналіз",
-            "3. Точний розрахунок (E+)",
-            "Збереження",
-            "Генерація Даних (Dev)",
-            "Навчання Нейромережі (Dev)",
-        ]
-    )
-    tab1, tab_DigitalDual, tab2, tab3, tab4, tabAI_Lab = tabs
+    tab_options = [
+        "1. Геометрія кімнати",
+        "2. Ескізний ШІ-аналіз",
+        "3. Точний розрахунок (E+)",
+        "Збереження",
+        "Генерація Даних (Dev)",
+        "Навчання Нейромережі (Dev)",
+    ]
 else:
-    tabs = st.tabs(
-        [
-            "1. Геометрія кімнати",
-            "2. Ескізний ШІ-аналіз",
-            "3. Точний розрахунок (E+)",
-            "Збереження",
-        ]
-    )
-    tab1, tab_DigitalDual, tab2, tab3 = tabs
+    tab_options = [
+        "1. Геометрія кімнати",
+        "2. Ескізний ШІ-аналіз",
+        "3. Точний розрахунок (E+)",
+        "Збереження",
+    ]
 
-with tab1:
+selected_tab = st.radio("Навігація", tab_options, horizontal=True, label_visibility="collapsed")
+
+if selected_tab == "1. Геометрія кімнати":
     geometry_tab.render(room_l, room_w, room_l_cut, room_w_cut)
 
-with tab2:
-    climate_tab.render(room_l, room_w, room_h, room_l_cut, room_w_cut)
-
-with tab_DigitalDual:
+elif selected_tab == "2. Ескізний ШІ-аналіз":
     advisor_tab.render(room_l, room_w, room_h, room_l_cut, room_w_cut)
 
-with tab3:
+elif selected_tab == "3. Точний розрахунок (E+)":
+    climate_tab.render(room_l, room_w, room_h, room_l_cut, room_w_cut)
+
+elif selected_tab == "Збереження":
     save_tab.render(room_l, room_w, room_h, room_l_cut, room_w_cut)
 
-if dev_mode:
-    with tab4:
-        data_gen_tab.render(room_l, room_w, room_h, room_l_cut, room_w_cut)
+elif selected_tab == "Генерація Даних (Dev)":
+    data_gen_tab.render(room_l, room_w, room_h, room_l_cut, room_w_cut)
 
-    with tabAI_Lab:
-        ai_lab_tab.render(room_l, room_w, room_h, room_l_cut, room_w_cut)
+elif selected_tab == "Навчання Нейромережі (Dev)":
+    ai_lab_tab.render(room_l, room_w, room_h, room_l_cut, room_w_cut)

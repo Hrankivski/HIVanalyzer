@@ -3,7 +3,7 @@ from ai import ai_engine
 
 
 def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
-    st.header("AI Advisor (Decision Support System)")
+    st.header("Інтелектуальний радник (AI Advisor)")
     st.write(
         "Цей модуль порівнює класичне керування (рекуператор на 100%) з інтелектуальним керуванням (AI Auto-Pilot) на проміжку 24 годин."
     )
@@ -36,12 +36,12 @@ def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
     
         if run_advisor:
             with st.spinner("Симуляція математичної моделі..."):
-                # Run Manual
+                # Симуляція ручного керування
                 df_man, _, _, _, man_energy_pen = ai_engine.simulate_24h(
                     ppo_model, room_config, agent_controlled=False, fixed_device_idx=0
                 )
     
-                # Run AI
+                # Симуляція інтелектуального керування
                 df_ai, best_device_idx, pm_pen, co2_pen, ai_energy_pen = (
                     ai_engine.simulate_24h(
                         ppo_model, room_config, agent_controlled=True
@@ -67,18 +67,18 @@ def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
                 )
                 xai_text_placeholder.success(xai_reasoning)
     
-                st.subheader("Порівняльний Аналіз (Manual vs AI)")
+                st.subheader("Порівняльний аналіз (ручне керування vs інтелектуальний автопілот)")
     
                 import plotly.graph_objects as go
     
-                # Енергія
+                # Графік енергоспоживання
                 fig_energy = go.Figure()
                 fig_energy.add_trace(
                     go.Scatter(
                         x=df_man["hour"],
                         y=df_man["energy_w"],
                         mode="lines",
-                        name="Звичайний Термостат (100%)",
+                        name="Термостат (100% потужності)",
                         line=dict(color="red", dash="dash"),
                     )
                 )
@@ -87,7 +87,7 @@ def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
                         x=df_ai["hour"],
                         y=df_ai["energy_w"],
                         mode="lines",
-                        name="AI Контролер",
+                        name="Інтелектуальний контролер",
                         line=dict(color="green", width=3),
                     )
                 )
@@ -98,14 +98,14 @@ def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
                 )
                 st.plotly_chart(fig_energy, use_container_width=True)
     
-                # CO2
+                # Графік динаміки CO₂
                 fig_co2 = go.Figure()
                 fig_co2.add_trace(
                     go.Scatter(
                         x=df_man["hour"],
                         y=df_man["co2"],
                         mode="lines",
-                        name="Звичайний Термостат",
+                        name="Термостат (ручне керування)",
                         line=dict(color="red", dash="dash"),
                     )
                 )
@@ -114,7 +114,7 @@ def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
                         x=df_ai["hour"],
                         y=df_ai["co2"],
                         mode="lines",
-                        name="AI Контролер",
+                        name="Інтелектуальний контролер",
                         line=dict(color="blue", width=3),
                     )
                 )
@@ -125,7 +125,7 @@ def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
                     annotation_position="bottom right",
                 )
                 fig_co2.update_layout(
-                    title="Рівень CO2 (ppm)",
+                    title="Рівень CO₂ (ppm)",
                     xaxis_title="Година доби",
                     yaxis_title="Концентрація (ppm)",
                 )

@@ -7,14 +7,20 @@ from ui import designer
 from simulation import simulation_engine
 
 
+@st.cache_data
+def load_and_analyze_dataset(filepath="data/training_dataset.csv"):
+    df = pd.read_csv(filepath)
+    corr = df.select_dtypes(include="number").corr()
+    return df, corr
+
 def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
-    st.subheader("Генератор синтетичних даних (Big Data)")
+    st.subheader("Генератор синтетичних даних")
     st.write(
         "Тут ви можете запустити пакетну симуляцію для випадкового варіювання параметрів та збору датасету для нейромережі."
     )
-    n_sims = st.number_input("Кількість симуляцій (Batch Size)", 5, 500, 50)
+    n_sims = st.number_input("Кількість симуляцій у пакеті", 5, 500, 50)
     
-    if st.button(f"Generate Training Data (Batch {n_sims})"):
+    if st.button(f"Згенерувати навчальні дані (Пакет: {n_sims})"):
         with st.status(f"Запуск {n_sims} симуляцій у фоні...") as status:
             json_data = designer.export_project(
                 room_l, room_w, room_h, room_l_cut, room_w_cut
@@ -32,6 +38,7 @@ def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
             success, count = runner.run_batch(n_sims)
     
             if success:
+                st.cache_data.clear()  # Очищення кешу для завантаження свіжих даних
                 status.update(
                     label=f"Успішно зібрано {count} записів!", state="complete"
                 )
@@ -39,12 +46,12 @@ def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
                 status.update(label="Помилка пакетної симуляції", state="error")
     
     st.markdown("---")
-    st.subheader("Аналітика Зібраних Даних (Data Quality)")
+    st.subheader("Аналітика зібраних даних")
     
     if os.path.exists("data/training_dataset.csv"):
-        df_ml = pd.read_csv("data/training_dataset.csv")
-    
-        # KPIs
+        df_ml, corr = load_and_analyze_dataset("data/training_dataset.csv")
+        
+        # Ключові показники якості датасету
         m_score, m1, m2, m3 = st.columns(4)
         if "CO2 (ppm)" in df_ml.columns:
             max_co2 = df_ml["CO2 (ppm)"].max()
@@ -62,7 +69,7 @@ def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
             m2.metric("Макс. CO2", f"{max_co2:.0f} ppm")
             m3.metric("Частка задухи (>1000ppm)", f"{danger_pct:.1f} %")
     
-            # Histogram
+            # Гістограма розподілу значень CO₂ в навчальному датасеті
             fig_hist = px.histogram(
                 df_ml,
                 x="CO2 (ppm)",
@@ -77,9 +84,7 @@ def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
                 annotation_text="Межа комфорту",
             )
             st.plotly_chart(fig_hist, use_container_width=True)
-    
-        # Heatmap
-        corr = df_ml.select_dtypes(include="number").corr()
+            
         fig_corr = px.imshow(
             corr,
             text_auto=".2f",

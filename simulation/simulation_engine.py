@@ -187,12 +187,13 @@ class SimulationRunner:
         # Вибір випадкового стрес-сценарію
         scenario = random.choices(
             ["normal", "crowd", "blackout", "extreme_pollution", "holiday_empty"],
-            weights=[0.5, 0.15, 0.15, 0.1, 0.1]
+            weights=[0.3, 0.25, 0.15, 0.2, 0.1]
         )[0]
         
         if scenario == "crowd":
             data["settings"]["occupants"] = random.randint(20, 50)
             data["settings"]["recuperator_efficiency"] = round(random.uniform(50.0, 90.0), 1)
+            data["settings"]["recuperator_max_flow_m3_h"] = random.choice([100.0, 250.0, 300.0, 600.0])
             data["settings"]["heater_power"] = random.randint(0, 3000)
             data["settings"]["soldering_active"] = random.choice([0.0, 1.0])
             data["settings"]["printer_active"] = random.choice([0.0, 1.0])
@@ -206,6 +207,7 @@ class SimulationRunner:
         elif scenario == "extreme_pollution":
             data["settings"]["occupants"] = random.randint(5, 15)
             data["settings"]["recuperator_efficiency"] = round(random.uniform(50.0, 90.0), 1)
+            data["settings"]["recuperator_max_flow_m3_h"] = random.choice([100.0, 250.0, 300.0, 600.0])
             data["settings"]["heater_power"] = random.randint(0, 3000)
             data["settings"]["soldering_active"] = random.uniform(5.0, 10.0) # Екстремальні викиди
             data["settings"]["printer_active"] = random.uniform(5.0, 10.0)
@@ -217,8 +219,9 @@ class SimulationRunner:
             data["settings"]["soldering_active"] = 0.0
             data["settings"]["printer_active"] = 0.0
         else: # normal
-            data["settings"]["occupants"] = random.randint(1, 10)
+            data["settings"]["occupants"] = random.randint(1, 15)
             data["settings"]["recuperator_efficiency"] = round(random.uniform(50.0, 90.0), 1)
+            data["settings"]["recuperator_max_flow_m3_h"] = random.choice([100.0, 250.0, 300.0, 600.0])
             data["settings"]["heater_power"] = random.randint(0, 3000)
             data["settings"]["soldering_active"] = random.choice([0.0, 1.0])
             data["settings"]["printer_active"] = random.choice([0.0, 1.0])
@@ -243,20 +246,31 @@ class SimulationRunner:
             df["Is_Working_Hour"] = ((df["Hour"] >= 8) & (df["Hour"] <= 18)).astype(int)
 
         # 2. Створення віконних/Lag (запізнілих) фічей (Lag Features)
-        # Припускаємо, що датафрейм є послідовним в часі. shift(1) - це крок вимірювання назад (напр. 10 хв)
+        # Припускаємо, що датафрейм є послідовним в часі. EnergyPlus рахує з кроком 1 година,
+        # тому shift(1)=1 годину тому, shift(2)=2 години тому.
+        # 2-годинне вікно важливе для теплової інерції стін: температура реагує на зовнішній вплив
+        # з запізненням 1-2 години.
         if "T_out (C)" in df.columns:
             df["T_out_lag_1"] = df["T_out (C)"].shift(1)
 
         if "T_in (C)" in df.columns:
             df["T_in_lag_1"] = df["T_in (C)"].shift(1)
+            df["T_in_lag_2"] = df["T_in (C)"].shift(2)  # 2 години тому
 
         if "CO2 (ppm)" in df.columns:
             df["CO2_lag_1"] = df["CO2 (ppm)"].shift(1)
-            # Тренд CO2 (різниця швидкості зміни рівня)
+            df["CO2_lag_2"] = df["CO2 (ppm)"].shift(2)  # 2 години тому
+            # Тренд CO₂: швидкість зміни концентрації за вікно у 2 години
             df["CO2_trend"] = df["CO2 (ppm)"] - df["CO2_lag_1"]
 
         # 3. Додавання статичних параметрів проєкту до кожного рядка як незалежних ознак
-        df["Volume_m3"] = geom.get("L", 0) * geom.get("W", 0) * geom.get("H", 0)
+        l   = geom.get("L", 0)
+        w   = geom.get("W", 0)
+        h   = geom.get("H", 0)
+        lc  = geom.get("L_cut", 0)
+        wc  = geom.get("W_cut", 0)
+        # Правильний об'єм Г-подібної кімнати: (загальний прямокутник - виріз) * висота
+        df["Volume_m3"] = (l * w - lc * wc) * h
         df["Wall_Thickness"] = sett.get("wall_thickness", 0.0)
         df["People_Count"] = sett.get("occupants", 0)
         df["Soldering_Active"] = sett.get("soldering_active", 0.0)
@@ -264,8 +278,15 @@ class SimulationRunner:
         df["Heater_Power"] = sett.get("heater_power", 0)
         df["Recuperator_Efficiency"] = sett.get("recuperator_efficiency", 0.0)
 
-        # 4. Видалення рядків з NaN (які утворились через зсув shift)
-        # Оскільки ми зсували на 1 крок, перший рядок симуляції буде видалено.
+        # 4. Температура припливного повітря після рекуперації — прямий фізичний сигнал для предбачення T_in.
+        # EnergyPlus виводить T_supply з ERV SA Outlet, але колонка може бути відсутня в сценаріях "blackout" / "holiday_empty".
+        if "T_supply (C)" in df.columns:
+            df["T_supply_lag_1"] = df["T_supply (C)"].shift(1)  # запізніла температура припливу
+        else:
+            df["T_supply_lag_1"] = 0.0  # вентиляція відключена (сценарій без ERV)
+
+        # 5. Видалення рядків з NaN (які утворились через зсув shift)
+        # Перші два рядки симуляції будуть видалені (через lag_1 і lag_2).
         df.dropna(inplace=True)
 
         return df

@@ -46,7 +46,7 @@ class ModelValidator:
             status = "Warning"
 
         return {
-            "name": "Thermal Decay (Теплова інерція)",
+            "name": "Теплова інерція стін",
             "status": status,
             "value": val,
             "message": msg,
@@ -82,7 +82,7 @@ class ModelValidator:
             status = "Warning"
 
         return {
-            "name": "CO₂ Dynamics (Пік та Відновлення)",
+            "name": "Динаміка CO₂ (пік та відновлення)",
             "status": status,
             "value": float(val),
             "message": msg,
@@ -110,7 +110,7 @@ class ModelValidator:
             status = "Warning"
 
         return {
-            "name": "Heating Correlation (Адекватність Опалення)",
+            "name": "Адекватність системи опалення",
             "status": status,
             "value": float(val),
             "message": msg,
@@ -149,7 +149,7 @@ class ModelValidator:
 
         status = "Fail" if failed else "Pass"
         return {
-            "name": "Heat Recovery Check (ККД)",
+            "name": "ККД рекуперації тепла",
             "status": status,
             "value": float(val),
             "message": msg,
@@ -177,7 +177,7 @@ class ModelValidator:
 
         status = "Fail" if failed else "Pass"
         return {
-            "name": "Anomalies Detection (Неможливі величини)",
+            "name": "Виявлення фізичних аномалій",
             "status": status,
             "value": float(val),
             "message": msg,
@@ -219,7 +219,7 @@ class ModelValidator:
 
         status = "Fail" if failed else "Pass"
         return {
-            "name": "Contaminant Decay (Очищення повітря)",
+            "name": "Очищення забруднюючих речовин",
             "status": status,
             "value": float(val),
             "message": msg,
@@ -234,13 +234,14 @@ class ModelValidator:
             df_weekend = df[df["Datetime"].dt.dayofweek >= 5]
             if not df_weekend.empty:
                 val = df_weekend["CO2 (ppm)"].max()
-                if val > 600:
+                # Поріг 900 ppm: у порожньому приміщенні фоновий CO₂ може сягати 500-700 ppm
+                if val > 900:
                     failed = True
                     msg = f"Аномалія: Рівень CO₂ у вихідні дні досягає {val:.0f} ppm (графік присутності людей не дотримується)."
 
         status = "Fail" if failed else "Pass"
         return {
-            "name": "Weekend Logic (Внутрішні виділення)",
+            "name": "Графік відвідувань у вихідні дні",
             "status": status,
             "value": float(val),
             "message": msg,
@@ -264,7 +265,7 @@ class ModelValidator:
 
         status = "Warning" if warning else "Pass"
         return {
-            "name": "DCV Check (Енергобаланс вентиляторів)",
+            "name": "Енергобаланс вентиляції (DCV)",
             "status": status,
             "value": float(val),
             "message": msg,

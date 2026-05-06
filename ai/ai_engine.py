@@ -17,6 +17,11 @@ def load_ai_model(path="models/recuperator_agent_v1.zip"):
         return None
 
 
+def clear_model_cache():
+    """Скидає кеш моделі, щоб після тренування UI підвантажив нову версію з диску."""
+    load_ai_model.clear()
+
+
 def simulate_24h(model, room_config, agent_controlled=True, fixed_device_idx=None):
     """
     Проганяє математичну симуляцію кімнати за 24 години (96 кроків).

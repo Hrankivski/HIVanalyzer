@@ -1,5 +1,5 @@
 import streamlit as st
-from ai import rl_agent, ml_surrogate
+from ai import rl_agent, ml_surrogate, ai_engine
 
 
 def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
@@ -47,11 +47,11 @@ def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
                             x=msg["y_test_co2"],
                             y=msg["y_pred_co2"],
                             mode="markers",
-                            name="CO2 Predict vs Actual",
+                            name="Порівняння CO₂: прогноз vs реальність",
                             marker=dict(color="blue", opacity=0.5),
                         )
                     )
-                    # Diagonal line
+                    # Діагональ ідеального збігу
                     min_v = min(msg["y_test_co2"])
                     max_v = max(msg["y_test_co2"])
                     fig_val.add_trace(
@@ -64,9 +64,9 @@ def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
                         )
                     )
                     fig_val.update_layout(
-                        title="Validation: Predicted vs Actual CO2",
-                        xaxis_title="Справжній CO2 (E+)",
-                        yaxis_title="Передбачений CO2 (LightGBM)",
+                        title="Валідація сурогатної моделі: прогноз vs реальні значення CO₂",
+                        xaxis_title="Реальне значення CO₂ (E+)",
+                        yaxis_title="Прогноз CO₂ (LightGBM)",
                     )
                     st.plotly_chart(fig_val, use_container_width=True)
                 else:
@@ -82,30 +82,78 @@ def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
         except ImportError:
             has_gpu = False
         cores = multiprocessing.cpu_count()
-        st.info(f"💻 **Hardware-Aware Оптимізація:** Знайдено **{cores} ядер CPU**. GPU: **{'Активно 🚀' if has_gpu else 'Відсутній'}**. \n\nВекторизація середовищ працюватиме у {cores} паралельних потоках на 100% потужності.")
+        st.info(f"💻 **Апаратна оптимізація:** Знайдено **{cores} ядер CPU**. GPU: **{'Активно 🚀' if has_gpu else 'Відсутній'}**. \n\nВекторизація середовищ працюватиме у {cores} паралельних потоках на 100% потужності.")
         
         steps = st.number_input(
-            "Кількість кроків (Timesteps)", 10000, 1000000, 50000, 10000
+            "Кількість кроків (Timesteps)", 1000, 1000000, 50000, 10000
         )
-        if st.button("Fine-tune PPO Агента", type="primary"):
-            st_text = st.empty()
-            st_progress = st.progress(0.0)
-            st_chart = st.empty()
-            with st.spinner(f"Агент проходить {steps} кроків..."):
-                success, msg = rl_agent.train_rl_agent(
-                    steps, st_progress, st_text, st_chart
-                )
-                if success:
-                    st.success("Навчання завершено!")
-                    st_progress.empty()
-                    st_text.empty()
+        if st.button("Донавчати PPO-агента", type="primary"):
+            import threading
+            import time
+            import pandas as pd
+
+            # shared_state — спільний dict між daemon-потоком (пише callback)
+            # та головним потоком Streamlit (читає і оновлює UI).
+            # Це єдиний thread-safe спосіб показувати прогрес без WebSocket-помилок.
+            shared_state = {
+                "pct": 0.0,
+                "num_timesteps": 0,
+                "rewards": [],
+                "steps": [],
+            }
+            _state = {"done": False, "success": False, "msg": ""}
+
+            def _run():
+                s, m = rl_agent.train_rl_agent(steps, shared_state=shared_state)
+                _state.update(done=True, success=s, msg=m)
+
+            thread = threading.Thread(target=_run, daemon=True)
+            thread.start()
+
+            status_txt = st.empty()
+            prog_bar = st.progress(0.0)
+            chart_placeholder = st.empty()
+
+            while not _state["done"] and thread.is_alive():
+                pct = shared_state["pct"]
+                num_ts = shared_state["num_timesteps"]
+                rewards = shared_state["rewards"]
+                reward_steps = shared_state["steps"]
+
+                try:
+                    prog_bar.progress(min(pct, 1.0))
+                    if pct >= 1.0:
+                        status_txt.text(
+                            f"Завершення: збір фінального буфера... ({num_ts} / {steps} кроків)"
+                        )
+                    else:
+                        status_txt.text(
+                            f"Прогрес навчання: {num_ts} / {steps} кроків ({int(pct * 100)}%)"
+                        )
+                    if len(rewards) >= 2:
+                        df_chart = pd.DataFrame(
+                            {"Середня нагорода": rewards}, index=reward_steps
+                        )
+                        chart_placeholder.line_chart(df_chart)
+                except Exception:
+                    pass  # WebSocket закритий — продовжуємо чекати
+                time.sleep(1)
+
+            thread.join(timeout=10)
+            try:
+                if _state["success"]:
+                    ai_engine.clear_model_cache()
+                    prog_bar.progress(1.0)
+                    st.success(_state["msg"])
+                elif _state["done"]:
+                    st.error(_state["msg"])
                 else:
-                    st.error(msg)
+                    st.warning("Навчання триває в фоні. Оновіть сторінку пізніше.")
+            except Exception:
+                pass  # Браузер відключився — модель вже збережена на диску
     
         st.markdown("---")
-        if st.button("📊 Оцінити надійність Агента (Benchmark)", type="secondary"):
-            from ai import ai_engine
-    
+        if st.button("📊 Оцінити надійність агента (Бенчмарк)", type="secondary"):
             model = ai_engine.load_ai_model()
             if model:
                 with st.spinner(

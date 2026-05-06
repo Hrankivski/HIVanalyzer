@@ -505,7 +505,8 @@ def _generate_schedules_and_internal_gains(settings, elements, occupants, lines)
     lines.append("    MainZone,                !- Zone Name")
     lines.append(f"    {emissions_rate:.6f},    !- Design Generation Rate {{m3/s}}")
     lines.append("    Lab_Activity_Spikes,     !- Schedule Name")
-    lines.append("    0.0,                     !- Design Removal Coefficient")
+    # Ненульовий коефіцієнт видалення: EnergyPlus моделює адсорбцію/осідання частинок
+    lines.append("    0.001,                   !- Design Removal Coefficient {m3/s}")
     lines.append("    AlwaysOn;                !- Removal Schedule Name\n")
 
     lines.append("ZoneContaminantSourceAndSink:Generic:Constant,")
@@ -513,7 +514,7 @@ def _generate_schedules_and_internal_gains(settings, elements, occupants, lines)
     lines.append("    MainZone,                !- Zone Name")
     lines.append(f"    {printer_emissions:.6f}, !- Design Generation Rate {{m3/s}}")
     lines.append("    Lab_Activity_Spikes,     !- Schedule Name")
-    lines.append("    0.0,                     !- Design Removal Coefficient")
+    lines.append("    0.001,                   !- Design Removal Coefficient {m3/s}")
     lines.append("    AlwaysOn;                !- Removal Schedule Name\n")
 
 
@@ -571,10 +572,11 @@ def _generate_hvac_and_ventilation(settings, occupants, lines):
     lines.append("      SET Fan_CO2 = 0.1 + ((CO2_PPM - 450) / 450) * 0.9,")
     lines.append("    ENDIF,")
     lines.append("    SET PM_Val = Zone_PM,")
-    lines.append("    IF PM_Val > 0.000005,")
+    # Поріг знижено з 5e-6 до 1e-6 щоб DCV реагував раніше та очищав швидше
+    lines.append("    IF PM_Val > 0.000001,")
     lines.append("      SET Fan_PM = 1.0,")
     lines.append("    ELSE,")
-    lines.append("      SET Fan_PM = 0.1 + (PM_Val / 0.000005) * 0.9,")
+    lines.append("      SET Fan_PM = 0.1 + (PM_Val / 0.000001) * 0.9,")
     lines.append("    ENDIF,")
     lines.append("    SET Fan_Frac = @Max Fan_CO2 Fan_PM,")
     lines.append("    SET StdRho = 1.204,")

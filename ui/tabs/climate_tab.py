@@ -86,8 +86,10 @@ def _run_ai_optimization(room_l, room_w, room_h, room_l_cut, room_w_cut):
             st.session_state.project_settings["recuperator_max_flow_m3_h"] = best_device["max_flow_rate"]
             st.session_state.project_settings["recuperator_efficiency"] = best_device["sensible_efficiency"] * 100
             st.success(
-                f"**Ідеальне обладнання знайдено:** {best_device['name']} (Потік: {best_device['max_flow_rate']} м³/год, ККД: {int(best_device['sensible_efficiency'] * 100)}%).\nЗапускаємо валідацію в EnergyPlus..."
+                f"**Ідеальне обладнання знайдено:** {best_device['name']} (Потік: {best_device['max_flow_rate']} м³/год, ККД: {int(best_device['sensible_efficiency'] * 100)}%)."
             )
+            with st.expander("📊 Рейтинг рекуператорів (за результатами бенчмарку)"):
+                st.markdown(msg)
             return True
         else:
             st.error("База `recuperator_db.json` не знайдена!")
@@ -119,20 +121,20 @@ def _plot_results(df_res, temp_dir):
     tab_temp, tab_co2, tab_air = st.tabs(["Температура", "CO₂", "Якість повітря"])
     x_data = "Datetime" if "Datetime" in df_plot.columns else df_plot.index
     x_col_name = "Datetime" if "Datetime" in df_plot.columns else "index"
-    x_label = "Дата і Час" if "Datetime" in df_plot.columns else "Шаг"
+    x_label = "Дата і Час" if "Datetime" in df_plot.columns else "Крок"
 
     with tab_temp:
         temp_cols = [c for c in ["T_in (C)", "T_out (C)"] if c in df_plot.columns]
         if temp_cols:
-            st.write("**За весь період (Глобальний тренд):**")
+            st.write("**За весь період (загальна динаміка):**")
             fig_temp_global = px.line(
                 df_plot, y=temp_cols,
-                labels={"value": "Температура (°C)", "index": "Шаг", "variable": "Показник"},
+                labels={"value": "Температура (°C)", "index": "Крок", "variable": "Показник"},
                 color_discrete_map={"T_in (C)": "#ff7f0e", "T_out (C)": "#1f77b4"},
             )
             st.plotly_chart(fig_temp_global, use_container_width=True)
 
-            st.write("**Детальний перегляд (з тягарцем для масштабування):**")
+            st.write("**Детальний перегляд (з повзунком масштабування):**")
             fig_temp_zoom = px.line(
                 df_plot, x=x_data, y=temp_cols,
                 labels={"value": "Температура (°C)", x_col_name: x_label, "variable": "Показник"},
@@ -148,7 +150,7 @@ def _plot_results(df_res, temp_dir):
             st.write("**За весь період (Глобальний тренд):**")
             fig_co2_global = px.line(
                 df_plot, y="CO2 (ppm)",
-                labels={"value": "Концентрація CO₂ (ppm)", "index": "Шаг"},
+                labels={"value": "Концентрація CO₂ (ppm)", "index": "Крок"},
                 color_discrete_sequence=["#d62728"],
             )
             st.plotly_chart(fig_co2_global, use_container_width=True)
@@ -167,7 +169,7 @@ def _plot_results(df_res, temp_dir):
             st.write("**За весь період (Глобальний тренд):**")
             fig_air_global = px.line(
                 df_plot, y="Generic Contaminant",
-                labels={"value": "Концентрація (У.О.)", "index": "Шаг"},
+                labels={"value": "Концентрація (ум. од.", "index": "Крок"},
                 color_discrete_sequence=["#9467bd"],
             )
             st.plotly_chart(fig_air_global, use_container_width=True)
@@ -181,7 +183,7 @@ def _plot_results(df_res, temp_dir):
             fig_air_zoom.update_xaxes(rangeslider_visible=True)
             st.plotly_chart(fig_air_zoom, use_container_width=True)
         else:
-            st.info("Дані про якість повітря (Generic Contaminants) відсутні.")
+            st.info("Дані про якість повітря (забруднюючі речовини) відсутні.")
 
     st.info(f"Файли симуляції (IDF, CSV, помилки) збережено в: {temp_dir}")
     st.session_state["latest_df"] = df_res
@@ -202,7 +204,10 @@ def _run_energyplus_simulation(room_l, room_w, room_h, room_l_cut, room_w_cut):
             st.write("Обробка даних...")
             df_res = simulation_engine.get_results(result_msg)
             if not df_res.empty:
-                _plot_results(df_res, temp_dir)
+                # Зберігаємо в session_state — графіки відображатимуться незалежно від кнопок
+                st.session_state["latest_df"] = df_res
+                st.session_state["latest_sim_dir"] = temp_dir
+                st.success("Симуляція завершена успішно! Результати збережено.")
             else:
                 st.warning("Симуляція пройшла, але потрібних колонок не знайдено в eplusout.csv.")
             status.update(label="Симуляція завершена", state="complete")
@@ -212,8 +217,8 @@ def _run_energyplus_simulation(room_l, room_w, room_h, room_l_cut, room_w_cut):
             status.update(label="Помилка симуляції", state="error")
 
 def _render_validation():
-    st.subheader("Перевірка реалістичності симуляції (Phase 8.1)")
-    if st.button("🔍 Validate Simulation Realism"):
+    st.subheader("Перевірка реалістичності симуляції")
+    if st.button("🔍 Перевірити результати симуляції"):
         with st.spinner("Аналіз фізичних законів та аномалій..."):
             val = validator.ModelValidator()
             results = val.run_all_tests(
@@ -266,7 +271,9 @@ def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
     if run_sim:
         _run_energyplus_simulation(room_l, room_w, room_h, room_l_cut, room_w_cut)
 
+    # Відображаємо результати та валідацію завжди, поки дані є в session_state
+    # Це гарантує що дані не зникають при натисканні Validate або переході між вкладками
     st.markdown("---")
-    
     if "latest_df" in st.session_state and not st.session_state["latest_df"].empty:
+        _plot_results(st.session_state["latest_df"], st.session_state.get("latest_sim_dir", ""))
         _render_validation()

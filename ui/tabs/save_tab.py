@@ -22,5 +22,5 @@ def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
         mime="text/plain",
     )
 
-    st.markdown("### Попередній перегляд маніфесту IDF")
-    st.text_area("IDF Structure", idf_data, height=400)
+    st.markdown("### Попередній перегляд структури IDF")
+    st.text_area("Вміст IDF-файлу", idf_data, height=400)

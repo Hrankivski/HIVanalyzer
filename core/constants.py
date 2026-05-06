@@ -1,4 +1,4 @@
-# materials and physical constants
+# Матеріали та фізичні константи системи
 
 MATERIALS = {
     "Цегла": {

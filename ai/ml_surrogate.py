@@ -9,29 +9,30 @@ import os
 
 SURROGATE_MODEL_PATH = "models/surrogate_physics.joblib"
 
-# Входи: Поточний стан + Дія
+# Вхідні ознаки: поточний стан середовища + параметри дії
 FEATURES = [
-    # State features
+    # Ознаки стану середовища
     "T_out (C)",
-    "T_in_lag_1",
-    "CO2_lag_1",
+    "T_in_lag_1",       # Температура всередині 1 годину тому
+    "T_in_lag_2",       # Температура всередині 2 години тому — теплова інерція стін
+    "T_supply_lag_1",   # Температура припливу після рекуперації — прямий сигнал хвилинного обміну
+    "CO2_lag_1",        # Концентрація CO₂ 1 годину тому
+    "CO2_lag_2",        # Концентрація CO₂ 2 години тому — тренд накопичення/розсіювання
     "People_Count",
     "Hour",
+    "DayOfWeek",        # День тижня: вихідні мають принципово інший CO₂-профіль
     "Is_Working_Hour",
     "Volume_m3",
     "Wall_Thickness",
     "Soldering_Active",
     "Printer_Active",
     "Heater_Power",
-    # Action features (from equipment simulation)
+    # Ознаки дії (параметри обраного обладнання)
     "Recuperator_Efficiency",
 ]
 
-# Що модель фізики нам каже про наступний крок (15 хв наперед)
-TARGETS = [
-    "T_in (C)",
-    "CO2_trend",  # Або безпосередньо CO2
-]
+# Цільові змінні (прогноз на наступний часовий крок)
+TARGETS = ["T_in (C)", "CO2 (ppm)"]
 
 
 def train_surrogate(dataset_path: str = "data/training_dataset.csv"):
@@ -44,10 +45,10 @@ def train_surrogate(dataset_path: str = "data/training_dataset.csv"):
 
     df = pd.read_csv(dataset_path)
 
-    # Validate features exist
+    # Перевірка наявності всіх вхідних ознак у датасеті
     for f in FEATURES:
         if f not in df.columns:
-            # If not there, we gracefully fail or try to impute
+            # Коректна обробка відсутньої ознаки з інформативним повідомленням
             return False, f"Відсутня колонка у масиві даних: {f}"
 
     if "CO2 (ppm)" not in df.columns:
@@ -58,9 +59,9 @@ def train_surrogate(dataset_path: str = "data/training_dataset.csv"):
     # Так як це Time-Series, y = df['T_in (C)'], df['CO2 (ppm)']
     # а X = df['T_in_lag_1'], df['CO2_lag_1']
 
-    # Базова очистка
+    # Базова фільтрація вхідних ознак
     X = df[FEATURES]
-    # Наш target
+    # Цільові змінні: температура та рівень CO₂ на наступному часовому кроці
     y = df[["T_in (C)", "CO2 (ppm)"]]
 
     X_train, X_test, y_train, y_test = train_test_split(
@@ -68,7 +69,15 @@ def train_surrogate(dataset_path: str = "data/training_dataset.csv"):
     )
 
     base_model = LGBMRegressor(
-        n_estimators=100, max_depth=10, n_jobs=-1, random_state=42
+        # 300 дерев забезпечують достатню виразну здатність для 16 фічей,
+        # max_depth=6 обмежує заглиблення і знижує overfitting порівняно з max_depth=10.
+        n_estimators=300,
+        max_depth=6,
+        learning_rate=0.05,
+        subsample=0.8,          # стохастична вибірка підвибірки — регуляризація
+        colsample_bytree=0.8,   # випадкове використання фічей по дереву
+        verbose=-1,
+        random_state=42
     )
     model = MultiOutputRegressor(base_model)
     model.fit(X_train, y_train)
@@ -78,7 +87,7 @@ def train_surrogate(dataset_path: str = "data/training_dataset.csv"):
     os.makedirs(os.path.dirname(SURROGATE_MODEL_PATH), exist_ok=True)
     joblib.dump(model, SURROGATE_MODEL_PATH)
 
-    # Передбачення для тест-сету (для графіків)
+    # Передбачення на тест-вибірці для побудови графіків валідації
     y_pred = model.predict(X_test)
 
     mae_t = mean_absolute_error(y_test["T_in (C)"], y_pred[:, 0])
