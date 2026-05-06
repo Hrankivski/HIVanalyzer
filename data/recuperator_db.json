@@ -1,34 +1,178 @@
 [
   {
     "id": 0,
-    "name": "EcoBasic 100 (G4)",
-    "max_flow_rate": 100,
-    "sensible_efficiency": 0.65,
+    "name": "Mitsubishi Electric LGH-15RX4-E",
+    "max_flow_rate": 150,
+    "sensible_efficiency": 0.80,
     "filter_class": 0.3,
-    "power_consumption": 20
-  },
-  {
-    "id": 1,
-    "name": "SmartVent 300 (F7)",
-    "max_flow_rate": 300,
-    "sensible_efficiency": 0.85,
-    "filter_class": 0.8,
-    "power_consumption": 50
-  },
-  {
-    "id": 2,
-    "name": "PremiumClean 250 (HEPA)",
-    "max_flow_rate": 250,
-    "sensible_efficiency": 0.92,
-    "filter_class": 0.99,
     "power_consumption": 65
   },
   {
+    "id": 1,
+    "name": "Mitsubishi Electric LGH-50RVX-E",
+    "max_flow_rate": 500,
+    "sensible_efficiency": 0.82,
+    "filter_class": 0.3,
+    "power_consumption": 165
+  },
+  {
+    "id": 2,
+    "name": "Mitsubishi Electric LGH-100RVX-E",
+    "max_flow_rate": 1000,
+    "sensible_efficiency": 0.80,
+    "filter_class": 0.3,
+    "power_consumption": 420
+  },
+  {
     "id": 3,
-    "name": "AeroPro XT 600 (F7)",
-    "max_flow_rate": 600,
-    "sensible_efficiency": 0.75,
+    "name": "Mitsubishi Electric LGH-200RVX-E",
+    "max_flow_rate": 2000,
+    "sensible_efficiency": 0.80,
+    "filter_class": 0.3,
+    "power_consumption": 980
+  },
+  {
+    "id": 4,
+    "name": "Climtec RD-100 Base",
+    "max_flow_rate": 40,
+    "sensible_efficiency": 0.93,
+    "filter_class": 0.3,
+    "power_consumption": 7
+  },
+  {
+    "id": 5,
+    "name": "Blauberg Vento Expert A50-1 Pro",
+    "max_flow_rate": 50,
+    "sensible_efficiency": 0.88,
+    "filter_class": 0.3,
+    "power_consumption": 5
+  },
+  {
+    "id": 6,
+    "name": "Prana 150 Standart",
+    "max_flow_rate": 70,
+    "sensible_efficiency": 0.91,
+    "filter_class": 0.3,
+    "power_consumption": 32
+  },
+  {
+    "id": 7,
+    "name": "Maico WR 310",
+    "max_flow_rate": 320,
+    "sensible_efficiency": 0.92,
     "filter_class": 0.8,
-    "power_consumption": 150
+    "power_consumption": 115
+  },
+  {
+    "id": 8,
+    "name": "Zehnder ComfoAir Q350",
+    "max_flow_rate": 350,
+    "sensible_efficiency": 0.90,
+    "filter_class": 0.8,
+    "power_consumption": 175
+  },
+  {
+    "id": 9,
+    "name": "Salda Smarty 3X P",
+    "max_flow_rate": 400,
+    "sensible_efficiency": 0.90,
+    "filter_class": 0.8,
+    "power_consumption": 120
+  },
+  {
+    "id": 10,
+    "name": "Daikin VAM500FC",
+    "max_flow_rate": 500,
+    "sensible_efficiency": 0.75,
+    "filter_class": 0.3,
+    "power_consumption": 160
+  },
+  {
+    "id": 11,
+    "name": "Zehnder ComfoAir Q600",
+    "max_flow_rate": 600,
+    "sensible_efficiency": 0.90,
+    "filter_class": 0.8,
+    "power_consumption": 350
+  },
+  {
+    "id": 12,
+    "name": "Helios KWL EC 1200",
+    "max_flow_rate": 1200,
+    "sensible_efficiency": 0.90,
+    "filter_class": 0.8,
+    "power_consumption": 450
+  },
+  {
+    "id": 13,
+    "name": "Salda RIS 1900 HE EKO",
+    "max_flow_rate": 1900,
+    "sensible_efficiency": 0.90,
+    "filter_class": 0.8,
+    "power_consumption": 950
+  },
+  {
+    "id": 14,
+    "name": "Daikin VAM2000FC",
+    "max_flow_rate": 2000,
+    "sensible_efficiency": 0.75,
+    "filter_class": 0.3,
+    "power_consumption": 850
+  },
+  {
+    "id": 15,
+    "name": "Systemair Topvex TR04",
+    "max_flow_rate": 2500,
+    "sensible_efficiency": 0.83,
+    "filter_class": 0.8,
+    "power_consumption": 1200
+  },
+  {
+    "id": 16,
+    "name": "Salda RIS 2500 VW EKO",
+    "max_flow_rate": 2500,
+    "sensible_efficiency": 0.90,
+    "filter_class": 0.8,
+    "power_consumption": 1200
+  },
+  {
+    "id": 17,
+    "name": "Vents VUT 3000 PB EC",
+    "max_flow_rate": 3000,
+    "sensible_efficiency": 0.85,
+    "filter_class": 0.8,
+    "power_consumption": 1500
+  },
+  {
+    "id": 18,
+    "name": "Systemair Topvex TR09",
+    "max_flow_rate": 4500,
+    "sensible_efficiency": 0.83,
+    "filter_class": 0.8,
+    "power_consumption": 2400
+  },
+  {
+    "id": 19,
+    "name": "Blauberg BlauAir CFH 5000",
+    "max_flow_rate": 5000,
+    "sensible_efficiency": 0.82,
+    "filter_class": 0.8,
+    "power_consumption": 2800
+  },
+  {
+    "id": 20,
+    "name": "Wolf CKL-A-7000",
+    "max_flow_rate": 7000,
+    "sensible_efficiency": 0.85,
+    "filter_class": 0.8,
+    "power_consumption": 4000
+  },
+  {
+    "id": 21,
+    "name": "FlaktGroup eQ Prime 100",
+    "max_flow_rate": 10000,
+    "sensible_efficiency": 0.84,
+    "filter_class": 0.8,
+    "power_consumption": 6000
   }
 ]

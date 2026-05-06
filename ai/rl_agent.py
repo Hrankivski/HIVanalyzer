@@ -272,10 +272,10 @@ def finetune_and_predict(room_config, timesteps=960, st_progress=None, st_text=N
     try:
         base_model = PPO.load(AGENT_MODEL_PATH, env=env_bench, device="cpu")
     except ValueError as e:
-        if "Observation spaces do not match" in str(e):
+        if "Observation spaces do not match" in str(e) or "Action spaces do not match" in str(e):
             return (
                 None,
-                "Формат середовища змінився (стара модель несумісна). Перейдіть на вкладку навчання та запустіть тренування з нуля!",
+                "Формат середовища або список пристроїв змінився (стара модель несумісна). Перейдіть на вкладку навчання та запустіть тренування з нуля!",
             )
         raise e
 
@@ -332,4 +332,3 @@ def finetune_and_predict(room_config, timesteps=960, st_progress=None, st_text=N
 
     # Повертаємо [best_device_idx, fan_speed_idx=3 (75%)] як початкову рекомендацію
     return [best_device_idx, 3], summary
-

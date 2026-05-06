@@ -10,7 +10,13 @@ from simulation import simulation_engine
 @st.cache_data
 def load_and_analyze_dataset(filepath="data/training_dataset.csv"):
     df = pd.read_csv(filepath)
-    corr = df.select_dtypes(include="number").corr()
+    # Гарантуємо, що числівні колонки дійсно числівні (після можливих збоїв CSV)
+    for col in df.columns:
+        if col != "Datetime":
+            df[col] = pd.to_numeric(df[col], errors='ignore')
+            
+    numeric_df = df.select_dtypes(include="number")
+    corr = numeric_df.corr() if not numeric_df.empty else pd.DataFrame()
     return df, corr
 
 def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
@@ -48,8 +54,12 @@ def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
     st.markdown("---")
     st.subheader("Аналітика зібраних даних")
     
-    if os.path.exists("data/training_dataset.csv"):
-        df_ml, corr = load_and_analyze_dataset("data/training_dataset.csv")
+    if os.path.exists("data/training_dataset.csv") and os.path.getsize("data/training_dataset.csv") > 0:
+        try:
+            df_ml, corr = load_and_analyze_dataset("data/training_dataset.csv")
+        except Exception as e:
+            st.error(f"Помилка завантаження датасету: {e}")
+            st.stop()
         
         # Ключові показники якості датасету
         m_score, m1, m2, m3 = st.columns(4)
@@ -85,14 +95,17 @@ def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
             )
             st.plotly_chart(fig_hist, use_container_width=True)
             
-        fig_corr = px.imshow(
-            corr,
-            text_auto=".2f",
-            aspect="auto",
-            color_continuous_scale="RdBu_r",
-            title="Матриця кореляцій",
-        )
-        st.plotly_chart(fig_corr, use_container_width=True)
+        if not corr.empty:
+            fig_corr = px.imshow(
+                corr,
+                text_auto=".2f",
+                aspect="auto",
+                color_continuous_scale="RdBu_r",
+                title="Матриця кореляцій",
+            )
+            st.plotly_chart(fig_corr, use_container_width=True)
+        else:
+            st.warning("Неможливо побудувати матрицю кореляцій: відсутні числівні дані.")
     
         with st.expander("Сирі дані датасету"):
             st.dataframe(df_ml.tail(100))

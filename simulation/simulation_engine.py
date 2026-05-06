@@ -319,10 +319,23 @@ class SimulationRunner:
             # Об'єднуємо всі датафрейми з різних симуляцій в один великий (вертикально)
             df_log = pd.concat(results_dfs, ignore_index=True)
 
+            file_exists = os.path.exists(self.dataset_path)
+            is_empty = file_exists and os.path.getsize(self.dataset_path) == 0
+
+            # Забезпечуємо стабільний порядок колонок (алфавітний або фіксований)
+            # Це критично для режиму append (mode='a')
+            df_log = df_log.reindex(sorted(df_log.columns), axis=1)
+
             os.makedirs(os.path.dirname(self.dataset_path), exist_ok=True)
-            if not os.path.exists(self.dataset_path):
+            if not file_exists or is_empty:
                 df_log.to_csv(self.dataset_path, index=False)
             else:
+                # Читаємо існуючі колонки для перевірки сумісності
+                try:
+                    df_existing = pd.read_csv(self.dataset_path, nrows=0)
+                    df_log = df_log.reindex(columns=df_existing.columns)
+                except Exception:
+                    pass
                 df_log.to_csv(self.dataset_path, mode="a", header=False, index=False)
             return True, len(df_log)
         return False, 0
