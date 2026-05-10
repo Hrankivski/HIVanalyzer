@@ -1,6 +1,9 @@
 import json
+
 import streamlit as st
+
 from ui import designer
+
 
 class MockSessionState(dict):
     def __getattr__(self, item):

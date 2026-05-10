@@ -1,5 +1,6 @@
 from unittest.mock import MagicMock
 
+
 def test_train_agent(monkeypatch):
     """Покриття для скрипта train_agent.py."""
     # Мокаємо SubprocVecEnv і PPO щоб не створювати реальні середовища та моделі

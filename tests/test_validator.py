@@ -1,5 +1,7 @@
 import pandas as pd
+
 from simulation import validator
+
 
 def test_validate_simulation_data_good_quality():
     """Тестує валідатор на 'хорошому' симуляційному датасеті."""

@@ -1,10 +1,12 @@
-import streamlit as st
+import os
+
 import pandas as pd
 import plotly.express as px
-import os
+import streamlit as st
+
 from core import constants
-from ui import designer
 from simulation import simulation_engine
+from ui import designer
 
 
 @st.cache_data

@@ -1,9 +1,11 @@
-import streamlit as st
+import json
+
 import numpy as np
 import pandas as pd
-import json
+import streamlit as st
 from stable_baselines3 import PPO
 from stable_baselines3.common.env_util import make_vec_env
+
 from ai.rl_environment import HVACEnv
 
 
@@ -59,6 +61,11 @@ def simulate_24h(model, room_config, agent_controlled=True, fixed_device_idx=Non
         if agent_controlled and model is not None:
             action, _ = model.predict(obs, deterministic=True)
             action = action[0]  # Because we use VecEnv
+            
+            # Якщо передано фіксований пристрій, примусово використовуємо його індекс,
+            # навіть якщо ШІ-агент "пропонує" інший (важливо для бенчмарку та Advisor).
+            if fixed_device_idx is not None:
+                action[0] = fixed_device_idx
         else:
             # Ручний режим: завжди максимальні оберти (4 = 100%)
             action = np.array(
@@ -81,14 +88,16 @@ def simulate_24h(model, room_config, agent_controlled=True, fixed_device_idx=Non
         logs["temp"].append(t_in)
 
         dev = devices[action[0]]
-        power = dev["power_consumption"] * (action[1] * 0.25)
-        logs["energy_w"].append(power)
+        # Миттєва електрична потужність (Вт)
+        power_w = dev["power_consumption"] * (action[1] * 0.25)
+        logs["energy_w"].append(power_w)
         logs["fan_speed"].append(action[1] * 25)  # %
 
         # Накопичуємо штрафи ШІ для модуля пояснень (XAI)
         logs["pm_pen"] += max(0.0, pm - 25.0) * 10.0
         logs["co2_pen"] += max(0.0, co2 - 1000.0) * 5.0
-        logs["energy_pen"] += power * 0.1
+        # Енергоспоживання в кВт*год для штрафу (споживання за 15 хв = Вт * 0.25 / 1000)
+        logs["energy_pen"] += (power_w * 0.25 / 1000.0) * 0.1
 
     return (
         pd.DataFrame(logs),

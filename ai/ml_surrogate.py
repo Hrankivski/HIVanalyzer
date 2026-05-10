@@ -1,11 +1,12 @@
-import pandas as pd
-import numpy as np
-from lightgbm import LGBMRegressor
-from sklearn.multioutput import MultiOutputRegressor
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_absolute_error, mean_squared_error
-import joblib
 import os
+
+import joblib
+import numpy as np
+import pandas as pd
+from lightgbm import LGBMRegressor
+from sklearn.metrics import mean_absolute_error, mean_squared_error
+from sklearn.model_selection import train_test_split
+from sklearn.multioutput import MultiOutputRegressor
 
 SURROGATE_MODEL_PATH = "models/surrogate_physics.joblib"
 

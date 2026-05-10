@@ -1,5 +1,6 @@
 from unittest.mock import MagicMock
 
+
 def test_main_execution(monkeypatch):
     """Фіктивний тест для імпорту та покриття main.py."""
     mock_st = MagicMock()

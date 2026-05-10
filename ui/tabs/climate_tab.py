@@ -1,9 +1,11 @@
-import streamlit as st
 import pandas as pd
 import plotly.express as px
+import streamlit as st
+
 from core import constants
-from ui import designer
 from simulation import idf_bridge, simulation_engine, validator
+from ui import designer
+
 
 def _render_climate_settings():
     st.subheader("Клімат-контроль (Термостати)")
@@ -56,9 +58,10 @@ def _calculate_mathematical_model(room_l, room_w, room_h, room_l_cut, room_w_cut
     )
 
 def _run_ai_optimization(room_l, room_w, room_h, room_l_cut, room_w_cut):
-    from ai import rl_agent
     import json
     import os
+
+    from ai import rl_agent
 
     st.info("Штучний Інтелект аналізує вашу кімнату. Запуск процесу адаптації...")
     room_vol = (room_l * room_w - room_l_cut * room_w_cut) * room_h

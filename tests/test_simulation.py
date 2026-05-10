@@ -1,7 +1,9 @@
 import json
-import tempfile
 import os
+import tempfile
+
 from simulation import idf_bridge, simulation_engine
+
 
 def test_idf_bridge_generate_idf():
     """Тестує, чи генерує idf_bridge валідну геометрію приміщення."""

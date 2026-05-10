@@ -4,9 +4,11 @@
 та їх парсинг у формат pandas DataFrame. Включає інструменти пакетної генерації.
 """
 import os
-import subprocess
-import pandas as pd
 import random
+import subprocess
+
+import pandas as pd
+
 from core import constants
 
 
@@ -292,9 +294,10 @@ class SimulationRunner:
         return df
 
     def run_batch(self, n_simulations=50):
-        from simulation import idf_bridge
         import json
         import tempfile
+
+        from simulation import idf_bridge
 
         results_dfs = []
         for i in range(n_simulations):

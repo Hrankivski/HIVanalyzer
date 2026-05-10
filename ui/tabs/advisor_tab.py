@@ -1,5 +1,6 @@
 import streamlit as st
-from ai import ai_engine
+
+from ai import ai_engine, rl_agent
 
 
 def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
@@ -35,16 +36,22 @@ def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
                 xai_text_placeholder.info("Очікування параметрів...")
     
         if run_advisor:
-            with st.spinner("Симуляція математичної моделі..."):
-                # Симуляція ручного керування
+            with st.spinner("Аналіз бази даних та підбір найкращого обладнання..."):
+                # Етап 1: Бенчмарк для вибору найкращого пристрою саме для цієї кімнати
+                # Це виправляє проблему, коли ШІ помилково обирав слабкий Prana 150 для великих кімнат.
+                best_action_data, summary = rl_agent.finetune_and_predict(room_config)
+                best_device_idx = best_action_data[0]
+                
+                # Етап 2: Симуляція 24 годин для порівняння
+                # Симуляція ручного керування ( Mitsubishi за замовчуванням)
                 df_man, _, _, _, man_energy_pen = ai_engine.simulate_24h(
                     ppo_model, room_config, agent_controlled=False, fixed_device_idx=0
                 )
     
-                # Симуляція інтелектуального керування
-                df_ai, best_device_idx, pm_pen, co2_pen, ai_energy_pen = (
+                # Симуляція інтелектуального керування з обраним пристроєм
+                df_ai, _, pm_pen, co2_pen, ai_energy_pen = (
                     ai_engine.simulate_24h(
-                        ppo_model, room_config, agent_controlled=True
+                        ppo_model, room_config, agent_controlled=True, fixed_device_idx=best_device_idx
                     )
                 )
     
@@ -54,20 +61,25 @@ def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
                     db = json.load(f)
                 best_device_name = db[best_device_idx]["name"]
     
-                manual_energy_sum = df_man["energy_w"].sum()
-                ai_energy_sum = df_ai["energy_w"].sum()
+                st.subheader("Порівняльний аналіз (ручне керування vs інтелектуальний автопілот)")
     
+                # Розрахунок сумарної енергії в кВт*год (Вт * 0.25 год / 1000)
+                total_energy_man = (df_man["energy_w"] * 0.25).sum() / 1000.0
+                total_energy_ai = (df_ai["energy_w"] * 0.25).sum() / 1000.0
+                
+                m1, m2 = st.columns(2)
+                m1.metric("Енергія (Термостат)", f"{total_energy_man:.3f} кВт·год")
+                m2.metric("Енергія (AI Auto-Pilot)", f"{total_energy_ai:.3f} кВт·год", delta=f"{((total_energy_man-total_energy_ai)/total_energy_man*100):.1f}%")
+
                 xai_reasoning = ai_engine.generate_xai_explanation(
                     best_device_name,
                     pm_pen,
                     co2_pen,
                     ai_energy_pen,
-                    manual_energy_sum,
-                    ai_energy_sum,
+                    total_energy_man * 1000, 
+                    total_energy_ai * 1000,
                 )
                 xai_text_placeholder.success(xai_reasoning)
-    
-                st.subheader("Порівняльний аналіз (ручне керування vs інтелектуальний автопілот)")
     
                 import plotly.graph_objects as go
     

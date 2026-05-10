@@ -1,5 +1,7 @@
 import numpy as np
+
 from ai.rl_environment import HVACEnv
+
 
 def test_hvac_env_initialization():
     """Перевірка коректної ініціалізації середовища з JSON базою пристроїв."""

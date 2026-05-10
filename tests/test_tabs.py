@@ -1,5 +1,6 @@
 from unittest.mock import MagicMock
 
+
 class MockSessionState(dict):
     def __getattr__(self, name): return self.get(name)
     def __setattr__(self, name, value): self[name] = value
@@ -47,7 +48,14 @@ def test_tabs_render(monkeypatch):
     monkeypatch.setattr("streamlit.tabs", lambda x: [mock_st] * len(x))
 
     try:
-        from ui.tabs import geometry_tab, save_tab, data_gen_tab, advisor_tab, ai_lab_tab, climate_tab
+        from ui.tabs import (
+            advisor_tab,
+            ai_lab_tab,
+            climate_tab,
+            data_gen_tab,
+            geometry_tab,
+            save_tab,
+        )
         geometry_tab.render(10.0, 5.0, 0.0, 0.0)
         save_tab.render(10.0, 5.0, 3.0, 0.0, 0.0)
         data_gen_tab.render(10.0, 5.0, 3.0, 0.0, 0.0)
@@ -94,7 +102,14 @@ def test_tabs_render_clicks(monkeypatch):
     monkeypatch.setattr("streamlit.tabs", lambda x: [mock_st] * len(x))
 
     try:
-        from ui.tabs import geometry_tab, save_tab, data_gen_tab, advisor_tab, ai_lab_tab, climate_tab
+        from ui.tabs import (
+            advisor_tab,
+            ai_lab_tab,
+            climate_tab,
+            data_gen_tab,
+            geometry_tab,
+            save_tab,
+        )
         geometry_tab.render(10.0, 5.0, 0.0, 0.0)
         save_tab.render(10.0, 5.0, 3.0, 0.0, 0.0)
         data_gen_tab.render(10.0, 5.0, 3.0, 0.0, 0.0)

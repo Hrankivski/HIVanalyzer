@@ -1,6 +1,8 @@
 import os
 import tempfile
+
 from core import extract
+
 
 def test_extract_results():
     """Тестує парсинг фіктивного CSV."""

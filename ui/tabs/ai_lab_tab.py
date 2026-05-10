@@ -1,5 +1,6 @@
 import streamlit as st
-from ai import rl_agent, ml_surrogate, ai_engine
+
+from ai import ai_engine, ml_surrogate, rl_agent
 
 
 def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
@@ -90,6 +91,7 @@ def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
         if st.button("Донавчати PPO-агента", type="primary"):
             import threading
             import time
+
             import pandas as pd
 
             # shared_state — спільний dict між daemon-потоком (пише callback)

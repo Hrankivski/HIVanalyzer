@@ -1,6 +1,8 @@
+import os
+
 import pytest
 from streamlit.testing.v1 import AppTest
-import os
+
 
 def test_full_app():
     """Тестує ініціалізацію всього застосунку Streamlit (покриває вкладки)."""

@@ -1,8 +1,10 @@
-import streamlit as st
-import pandas as pd
-import plotly.graph_objects as go
 import json
 import os
+
+import pandas as pd
+import plotly.graph_objects as go
+import streamlit as st
+
 from core import constants
 
 

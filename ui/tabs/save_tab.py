@@ -1,7 +1,10 @@
-import streamlit as st
 import datetime
-from ui import designer
+
+import streamlit as st
+
 from simulation import idf_bridge
+from ui import designer
+
 
 def render(room_l, room_w, room_h, room_l_cut, room_w_cut):
     st.subheader("Управління файлом проєкту")

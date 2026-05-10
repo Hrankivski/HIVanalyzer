@@ -3,12 +3,14 @@
 Визначає правила, нагороди та простір станів для агента, який вчиться керувати 
 HVAC-системою, використовуючи сурогатну модель фізики приміщення.
 """
-import gymnasium as gym
-from gymnasium import spaces
-import numpy as np
 import json
 import math
 import os
+
+import gymnasium as gym
+import numpy as np
+from gymnasium import spaces
+
 from ai import ml_surrogate
 
 

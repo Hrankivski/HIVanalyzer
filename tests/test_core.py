@@ -1,5 +1,6 @@
 from core import constants
 
+
 def test_materials_constants():
     """Перевірка наявності базових матеріалів та їх фізичних властивостей."""
     assert "Цегла" in constants.MATERIALS

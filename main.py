@@ -4,9 +4,17 @@
 запуску симуляцій EnergyPlus та взаємодії зі штучним інтелектом.
 """
 import streamlit as st
-from ui.tabs import geometry_tab, climate_tab, advisor_tab, save_tab, data_gen_tab, ai_lab_tab
-from ui import designer
+
 from core import constants
+from ui import designer
+from ui.tabs import (
+    advisor_tab,
+    ai_lab_tab,
+    climate_tab,
+    data_gen_tab,
+    geometry_tab,
+    save_tab,
+)
 
 st.set_page_config(page_title="Recuperator Optimizer", layout="wide")
 designer.init_session_state()

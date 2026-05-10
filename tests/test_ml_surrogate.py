@@ -1,8 +1,11 @@
-import pytest
 import os
 import tempfile
+
 import pandas as pd
+import pytest
+
 from ai import ml_surrogate
+
 
 def test_train_surrogate_with_mock_data():
     """Тестування пайплайну навчання сурогатної моделі на штучних даних."""

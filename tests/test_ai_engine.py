@@ -1,5 +1,7 @@
 import pandas as pd
+
 from ai import ai_engine
+
 
 def test_generate_xai_explanation():
     """Перевіряє, чи система XAI формує логічне пояснення."""

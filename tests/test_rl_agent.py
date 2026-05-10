@@ -1,5 +1,7 @@
 import numpy as np
+
 from ai import rl_agent
+
 
 def test_load_rl_agent():
     """Тестує завантаження RL агента. Якщо файлу немає, має повернутись None."""

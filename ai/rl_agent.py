@@ -3,8 +3,8 @@
 Відповідає за створення, тренування та використання агента PPO (Proximal Policy Optimization) 
 для оптимального керування рекуператором.
 """
-import os
 import multiprocessing
+import os
 
 try:
     import torch
@@ -14,8 +14,8 @@ except ImportError:
 
 try:
     from stable_baselines3 import PPO
-    from stable_baselines3.common.env_util import make_vec_env
     from stable_baselines3.common.callbacks import BaseCallback
+    from stable_baselines3.common.env_util import make_vec_env
     from stable_baselines3.common.vec_env import VecNormalize
 except ImportError:
     PPO = None

@@ -1,5 +1,7 @@
-from simulation import simulation_engine
 import pandas as pd
+
+from simulation import simulation_engine
+
 
 def test_generate_random_params():
     """Перевіряє генерацію параметрів."""
@@ -44,9 +46,9 @@ def test_extract_features_targets():
         pass
 
 def test_run_simulation(monkeypatch):
+    import os
     import subprocess
     import tempfile
-    import os
     
     mock_run = type('MockResult', (object,), {'returncode': 0, 'stderr': ''})()
     monkeypatch.setattr(subprocess, "run", lambda *args, **kwargs: mock_run)
