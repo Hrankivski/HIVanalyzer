@@ -30,9 +30,7 @@
         "room_h": 3.25,
         "room_l_cut": 5.75,
         "room_w_cut": 2.3,
-        "occupancy": 10,
-        "eplus_exe": "C:\\EnergyPlusV25-2-0\\energyplus.exe",
-        "weather_file": "weather\\UKR_KC_Kyiv.333450_TMYx.2009-2023.epw"
+        "occupancy": 10
     },
     "elements": [
         {
