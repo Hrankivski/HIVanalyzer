@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  hivanalyzer:
+    # Вказуємо збірку з поточного каталогу (для деплою через GitHub)
+    build: .
+    # Тег образу (використовується як ім'я при збірці або береться з .tar архіву)
+    image: hivanalyzer:defense
+    container_name: hivanalyzer_app
+    ports:
+      - "4000:8501"
+    volumes:
+      # Прокидаємо папки, щоб симуляції і моделі не стирались при перезапуску
+      - ./data:/app/data
+      - ./models:/app/models
+    restart: unless-stopped

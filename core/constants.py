@@ -1,3 +1,5 @@
+import os
+
 # Матеріали та фізичні константи системи
 
 MATERIALS = {
@@ -22,8 +24,8 @@ SIMULATION = {
     "time_step_hours": 1.0,  # Крок розрахунку
     "default_temp_in": 20.0,  # Дефолтна температура в приміщенні
     "default_temp_out": -5.0,  # Дефолтна температура зовні
-    "eplus_exe": r"C:\EnergyPlusV25-2-0\energyplus.exe",  # Default Windows path
-    "weather_file": r"weather\UKR_KC_Kyiv.333450_TMYx.2009-2023.epw",
+    "eplus_exe": os.getenv("EPLUS_EXE", r"C:\EnergyPlusV25-2-0\energyplus.exe"),  # Default Windows path or Docker Linux path
+    "weather_file": os.path.join("weather", "UKR_KC_Kyiv.333450_TMYx.2009-2023.epw"),
 }
 
 VALIDATION_THRESHOLDS = {

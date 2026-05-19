@@ -22,11 +22,17 @@ ruff_log.txt
 dummy_db.json
 ppo_hvac_tensorboard/
 
-# Weather files
-weather/
 
 # Environment
 .env
 venv/
 env/
 .venv/
+
+# Deployment scripts and artifacts
+pack_for_defense.ps1
+deploy_on_server.bat
+deploy_on_server.sh
+defense_manifest.md
+defense_release/
+
